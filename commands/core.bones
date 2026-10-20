@@ -98,7 +98,7 @@ command.prototype.bootstrap = function(plugin, callback) {
     settings.files = path.resolve(settings.files.replace(/^~/, process.env.HOME));
     settings.coreUrl = settings.coreUrl || '127.0.0.1:' + settings.port;
     settings.tileUrl = settings.tileUrl || '127.0.0.1:' + settings.tilePort;
-    cartoRef.setVersion(mapnik.versions.mapnik);
+    cartoRef.setVersion(require('../lib/cartoversion'));
 
     Bones.plugin.abilities = {
         // Get the unique version (from the VERSION file) that will be used in the parens in the heading

@@ -5,8 +5,8 @@ var count_module = function(name,callback) {
     var cmd = 'npm ls ' + name;
     exec(cmd,
         function (error, stdout, stderr) {
-            // Added check to remove deduped results.  CJS 1/24/19
-            var pattern = new RegExp(name+'@\\d+.\\d+.\\d+\\s+\\\n','g')
+            // Count only non-deduped entries; npm aliases print as name@npm:pkg@x.y.z.
+            var pattern = new RegExp('[\\s\u2500]' + name + '@(npm:\\S+@)?\\d+\\.\\d+\\.\\d+$','gm')
             var match = stdout.match(pattern);
             if (!match) {
                 return callback(null,0);

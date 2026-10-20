@@ -1,0 +1,32 @@
+{
+    "name": "srs",
+    "version": "1.2.0",
+    "main": "./lib/index.js",
+    "description": "Spatial reference library for node",
+    "keywords": [
+        "map",
+        "projection",
+        "spatialreference",
+        "srid",
+        "proj4",
+        "mercator",
+        "gdal",
+        "ogr",
+        "osr"
+    ],
+    "url": "http://github.com/mapbox/node-srs",
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/mapbox/node-srs.git"
+    },
+    "dependencies": {
+        "gdal-async": "^3.12.3"
+    },
+    "author": "Dane Springmeyer <dane@mapbox.com>",
+    "licenses": [
+        "BSD"
+    ],
+    "scripts": {
+        "test": "mocha -R spec"
+    }
+}

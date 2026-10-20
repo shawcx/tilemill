@@ -1,15 +1,17 @@
 # Build Stage
-FROM node:8.15 AS BUILD
+FROM node:24-trixie AS BUILD
 
 WORKDIR /usr/src/app
 # Copy content of git repo to container
 COPY ./package.json /usr/src/app/
 COPY ./package-lock.json /usr/src/app/
+COPY ./vendor /usr/src/app/vendor
+COPY ./lib/gitutil.js /usr/src/app/lib/
 
-RUN npm install --only=production && npm prune --production
+RUN npm ci --omit=dev
 
 # Production Stage
-FROM node:8.15-slim
+FROM node:24-trixie-slim
 
 # Copy tilemill and node modules to new container
 WORKDIR /usr/src/app
@@ -23,4 +25,3 @@ EXPOSE 20008
 EXPOSE 20009
 
 CMD ["node", "/usr/src/app/index.js", "--listenHost=0.0.0.0"]
-

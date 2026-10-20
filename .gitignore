@@ -2,6 +2,7 @@
 /_site
 /platforms/osx/build
 /node_modules
+/vendor/*/node_modules
 /test/fixtures/files
 npm-debug.log
 VERSION

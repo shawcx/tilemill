@@ -1,0 +1,47 @@
+{
+    "name": "tilelive",
+    "version": "5.14.0",
+    "main": "./lib/tilelive.js",
+    "description": "Frontend for various tile backends, mapnik and mbtiles",
+    "url": "http://github.com/tilemill-project/tilelive.js",
+    "keywords": [
+        "map",
+        "server",
+        "mapnik",
+        "tms"
+    ],
+    "licenses": [
+        {
+            "type": "BSD"
+        }
+    ],
+    "repository": {
+        "type": "git",
+        "url": "http://github.com/tilemill-project/tilelive.js.git"
+    },
+    "author": {
+        "name": "MapBox",
+        "url": "http://mapbox.com/",
+        "email": "info@mapbox.com"
+    },
+    "contributors": [
+        "Tom MacWright <tmcw>",
+        "Will White <willwhite>",
+        "Dane Springmeyer <springmeyer>",
+        "Young Hahn <yhahn>",
+        "Konstantin K\u00e4fer <kkaefer>"
+    ],
+    "dependencies": {
+        "optimist": "0.6.1",
+        "@mapbox/sphericalmercator": "1.1.0"
+    },
+    "bin": {
+        "tilelive-copy": "./bin/copy"
+    },
+    "engines": {
+        "node": ">= 0.6.0 < 0.11.0"
+    },
+    "scripts": {
+        "test": "mocha -R spec -t 10000"
+    }
+}

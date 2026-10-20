@@ -10,7 +10,7 @@ We are looking for people to get involved!  Take a look at some of the current F
 # General Info
 TileMill is a modern map design studio powered by [Node.js](https://nodejs.org) and [Mapnik](https://mapnik.org).
 
-- TileMill is tested on Linux with Node 8.11.3 LTS, and on MacOS 10.14 with Node 8.15.0 lts/carbon
+- TileMill is tested on Linux with Node 24 LTS (Node 22 or newer is required).
 - TileMill currently only works in server mode, there is no standalone GUI.  Your browser is used for the interface.
 - There are no native packages provided. Installation requires cloning this repo. See details below under *Installation*.
 - Tilemill should theoretically work on the Windows platform, but it isn't tested.
@@ -18,11 +18,9 @@ TileMill is a modern map design studio powered by [Node.js](https://nodejs.org) 
 
 # Dependencies
 
-- Mapnik > v3.6.2 (but may work on earlier versions)
-- Node.js:  (earlier Node.js versions may work, but are not tested)
-	- Ubuntu: v8.11.x
-	- OSX: v8.15.x lts/carbon
-- Protobuf: Ubunto: these need to be installed: libprotobuf-lite and protoc
+- Node.js 22 or newer (tested on 24 LTS)
+- Mapnik, SQLite and GDAL come as prebuilt binaries via `@mapnik/mapnik`, `sqlite3` and `gdal-async`; no system libraries are needed on Linux x64/arm64 or macOS.
+- `bones`, `millstone`, `tilelive` and `srs` are vendored under `vendor/` (npm workspaces) with fixes for modern Node.
 
 
 # Installation
@@ -30,8 +28,8 @@ TileMill is a modern map design studio powered by [Node.js](https://nodejs.org) 
 
     git clone https://github.com/tilemill-project/tilemill.git
     cd tilemill
-    nvm install lts/carbon
-    nvm use v8.15.0
+    nvm install 24
+    nvm use 24
     npm install
     npm start
 

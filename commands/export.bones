@@ -525,7 +525,7 @@ command.prototype.tilelive = function (project, callback) {
 
             task.on('error', function(err, tile) {
                 console.warn('\r\033[K' + tile.toString() + ': ' + err.message);
-                fs.write(fd, JSON.stringify(tile) + '\n');
+                fs.write(fd, JSON.stringify(tile) + '\n', function() {});
                 report(task.stats.snapshot());
             });
 
@@ -557,7 +557,7 @@ command.prototype.tilelive = function (project, callback) {
             });
 
             if (!cmd.opts.quiet) {
-                util.print(formatString('\r\033[K[%s] Part(%s/%s) %s%% %s/%s @ %s/s | %s left | ✓ %s ■ %s □ %s fail %s',
+                process.stderr.write(formatString('\r\033[K[%s] Part(%s/%s) %s%% %s/%s @ %s/s | %s left | ✓ %s ■ %s □ %s fail %s',
                     formatDuration(stats.date - task.started),
                     bboxIndex + 1,
                     bboxes.length,
