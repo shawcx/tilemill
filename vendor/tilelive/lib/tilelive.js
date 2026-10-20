@@ -1,6 +1,6 @@
 var tilelive = exports;
 var path = require('path');
-var url = require('url');
+var parseUri = require('./parseuri');
 var util = require('util');
 var os = require('os');
 var Queue = require('./queue');
@@ -79,7 +79,7 @@ tilelive.load = function(uri, callback) {
         throw new Error('Callback required as second argument');
     }
 
-    if (typeof uri === 'string') uri = url.parse(uri, true);
+    if (typeof uri === 'string') uri = parseUri(uri, true);
 
     // Handle uris in the format /path/to/dir?id=bar
     if (!uri.protocol && uri.pathname && uri.query.id) {
@@ -98,7 +98,7 @@ tilelive.load = function(uri, callback) {
 };
 
 tilelive.auto = function(uri) {
-    uri = url.parse(uri);
+    uri = parseUri(uri);
 
     // Attempt to load any modules that may match keyword pattern.
     var keyword = uri.protocol

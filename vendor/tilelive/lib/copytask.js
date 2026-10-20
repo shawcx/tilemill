@@ -1,5 +1,5 @@
 var tilelive = require('..');
-var url = require('url');
+var parseUri = require('./parseuri');
 var fs = require('fs');
 var Scheme = require('./scheme');
 const EventEmitter = require('events');
@@ -15,8 +15,8 @@ function CopyTask(from, to, scheme, job) {
         this.sink = to;
         to = 'temporary://';
     }
-    this.from = typeof from === 'string' ? url.parse(from) : from;
-    this.to = typeof to === 'string' ? url.parse(to) : to;
+    this.from = typeof from === 'string' ? parseUri(from) : from;
+    this.to = typeof to === 'string' ? parseUri(to) : to;
     this.scheme = scheme;
     this.started = null;
     this.ended = null;

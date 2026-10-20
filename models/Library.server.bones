@@ -8,7 +8,6 @@ var winDrives = require('../lib/fsutil').winDrives;
 var rm = require('../lib/fsutil').rm;
 var s3 = require('../lib/s3');
 var config = Bones.plugin.config;
-var url = require('url');
 // node v6 -> v8 compatibility
 var existsAsync = require('fs').exists || require('path').exists;
 var millstone = require('millstone');
@@ -43,6 +42,13 @@ var formatFileSize = function(size) {
     }
 
     return Math.round(scaled * 100) / 100 + ' ' + suffix;
+};
+
+// URL of an S3 object. Setting `pathname` escapes `?` and `#` in the key.
+var s3Url = function(bucket, key) {
+    var uri = new URL('http://' + bucket + '.s3.amazonaws.com');
+    uri.pathname = key;
+    return uri.href;
 };
 
 models.Library.prototype.sync = function(method, model, success, error) {
@@ -158,11 +164,7 @@ models.Library.prototype.sync = function(method, model, success, error) {
 
                     if (isFile && _(ext).include(path.extname(filepath).toLowerCase())) {
                         return {
-                            uri: url.format({
-                                protocol: 'http:',
-                                host: options.bucket + '.s3.amazonaws.com',
-                                pathname: filepath
-                            }),
+                            uri: s3Url(options.bucket, filepath),
                             name: path.basename(filepath),
                             size: formatFileSize(obj.Size[0].text)
                         };

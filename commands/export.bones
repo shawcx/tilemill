@@ -1,7 +1,5 @@
 var fs = require('fs');
-var url = require('url');
 var path = require('path');
-var request = require('request');
 var crypto = require('crypto');
 var util = require('util');
 var Step = require('step');
@@ -304,7 +302,7 @@ command.prototype.complete = function(err, data) {
             remaining: 0,
             updated: +new Date()
         });
-        this.put(data, process.exit);
+        this.put(data, function() { process.exit(0); });
     }
 };
 
@@ -332,14 +330,17 @@ command.prototype.put = function(data, callback) {
     if (!this.opts.url) {
         return callback();
     }
-    request.put({
-        uri: this.opts.url,
+    fetch(this.opts.url, {
+        method: 'PUT',
         headers: {
-            'Host': url.parse(this.opts.url).host,
+            'Content-Type': 'application/json',
             'Cookie': 'bones.token=token'
         },
-        json: _(data).extend({'bones.token': 'token'})
-    }, callback);
+        body: JSON.stringify(_(data).extend({'bones.token': 'token'}))
+    }).then(function(res) {
+        if (!res.ok) throw new Error('Export status update failed with status ' + res.status);
+        return res.arrayBuffer();
+    }).then(function() { callback(); }, callback);
 };
 
 

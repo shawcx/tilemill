@@ -17,7 +17,7 @@ var count_module = function(name,callback) {
 
 describe('Testing Config Functions [config loading pwnage] (duplicate_module.test.js)', function() {
 
-['optimist','sqlite3','mapnik'].forEach(function(mod) {
+['minimist','sqlite3','mapnik'].forEach(function(mod) {
     it('there should only be one ' + mod + ' module otherwise you are hosed', function(done) {
          count_module(mod, function(err,count) {
             if (err) throw err;

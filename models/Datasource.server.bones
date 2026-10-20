@@ -1,5 +1,4 @@
 var path = require('path');
-var url = require('url');
 var fs = require('fs');
 var mapnik = require('mapnik');
 var Step = require('step');

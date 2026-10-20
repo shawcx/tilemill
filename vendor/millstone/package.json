@@ -22,17 +22,9 @@
         "underscore": "~1.6.0",
         "step": "~0.0.5",
         "generic-pool": "~2.4.1",
-        "request": "2.x",
         "srs": "1.2.0",
-        "mime": "~1.2.11",
-        "mkdirp": "~0.5.0",
-        "optimist": "~0.6.1",
-        "adm-zip": "^0.6.1"
-    },
-    "bin": {
-        "millstone": "./bin/millstone"
-    },
-    "scripts": {
-        "test": "mocha -R spec --timeout 10000"
+        "mime": "~1.6.0",
+        "adm-zip": "^0.6.1",
+        "undici": "^8.12.3"
     }
 }

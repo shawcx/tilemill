@@ -12,9 +12,8 @@ var existsSync = require('fs').existsSync || require('path').existsSync;
 
 process.title = 'tilemill';
 
-// This is necessary to make optimist not special-case into coffeescript as
-// certain node installs (e.g. ubuntu node ppa) do not use `node` as the binary
-// name.
+// Report the binary as `node` in help output, as certain node installs
+// (e.g. ubuntu node ppa) do not use `node` as the binary name.
 process.argv[0] = 'node';
 
 if (process.platform === 'win32') {
@@ -29,7 +28,7 @@ if (process.platform === 'win32') {
 // upstream in bones.
 var config = path.join(process.env.HOME, '.tilemill/config.json');
 if (existsSync(config)) {
-    var argv = require('optimist').argv;
+    var argv = require('bones').argv;
     argv.config = argv.config || config;
 }
 

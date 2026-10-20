@@ -1,10 +1,8 @@
 var fs = require('fs');
 var path = require('path');
-var url = require('url');
 var crypto = require('crypto');
 var EventEmitter = require('events').EventEmitter;
 var mime = require('mime');
-var mkdirp = require('mkdirp');
 
 var existsAsync = require('fs').exists || require('path').exists;
 var existsSync = require('fs').existsSync || require('path').existsSync;
@@ -14,7 +12,9 @@ var env = process.env.NODE_ENV || 'development';
 // Third party modules
 var _ = require('underscore'),
     srs = require('srs'),
-    request = require('request'),
+    Readable = require('stream').Readable,
+    pipeline = require('stream').pipeline,
+    undici = require('undici'),
     zipfile = require('./zipfile'),
     Step = require('step'),
     utils = require('./util.js');
@@ -89,6 +89,20 @@ var pool = require('generic-pool').Pool({
 });
 
 
+// Downloads honor HTTP_PROXY (for http and https URLs, as `request` did),
+// HTTPS_PROXY and NO_PROXY.
+var proxy_agent = null;
+function proxyAgent() {
+    if (!proxy_agent) {
+        proxy_agent = new undici.EnvHttpProxyAgent({
+            httpProxy: process.env.HTTP_PROXY || process.env.http_proxy,
+            httpsProxy: process.env.HTTPS_PROXY || process.env.https_proxy ||
+                process.env.HTTP_PROXY || process.env.http_proxy
+        });
+    }
+    return proxy_agent;
+}
+
 function download(url, options, callback) {
     if (env == 'development') {
         if (!download_log_interval) {
@@ -137,50 +151,46 @@ function download(url, options, callback) {
                 return return_on_error(err);
             } else {
                 if (env == 'development') console.error("[millstone] downloading: '" + url + "'");
-                var req;
-                try {
-                req = request({
-                    url: url,
-                    proxy: process.env.HTTP_PROXY
-                });
-                } catch (err) {
-                    // catch Invalid URI error
-                    return return_on_error(err);
-                }
-                req.on('error', function(err) {
-                    return return_on_error(err);
-                });
-                req.pipe(fs.createWriteStream(dl)).on('error', function(err) {
-                    return return_on_error(err);
-                }).on('close', function() {
-                    if (!req.response || (req.response && req.response.statusCode >= 400)) {
-                        return return_on_error(new Error('server returned ' + req.response.statusCode));
-                    } else {
-                        pool.release(obj);
-                        fs.rename(dl, options.filepath, function(err) {
-                            if (err) {
-                              downloads[dkey].emit('done', err);
-                              delete downloads[dkey];
-                              return callback(err);
-                            } else {
-                                if (env == 'development') console.error("[millstone] finished downloading '" + options.filepath + "'");
-                                // We store the headers from the download in a hidden file
-                                // alongside the data for future reference. Currently, we
-                                // only use the `content-disposition` header to determine
-                                // what kind of file we downloaded if it doesn't have an
-                                // extension.
-                                var req_meta = _(req.req.res.headers).clone();
-                                if (req.req.res.request && req.req.res.request.path) {
-                                    req_meta.path = req.req.res.request.path;
-                                }
-                                fs.writeFile(metapath(options.filepath), JSON.stringify(req_meta), 'utf-8', function(err) {
-                                    downloads[dkey].emit('done', err, options.filepath);
-                                    delete downloads[dkey];
-                                    return callback(err, options.filepath);
-                                });
-                            }
+                var response;
+                undici.fetch(url, { dispatcher: proxyAgent() }).then(function(res) {
+                    response = res;
+                    if (!res.ok) throw new Error('server returned ' + res.status);
+                    return new Promise(function(resolve, reject) {
+                        pipeline(Readable.fromWeb(res.body), fs.createWriteStream(dl), function(err) {
+                            return err ? reject(err) : resolve();
                         });
-                    }
+                    });
+                }).then(function() {
+                    pool.release(obj);
+                    fs.rename(dl, options.filepath, function(err) {
+                        if (err) {
+                          downloads[dkey].emit('done', err);
+                          delete downloads[dkey];
+                          return callback(err);
+                        } else {
+                            if (env == 'development') console.error("[millstone] finished downloading '" + options.filepath + "'");
+                            // We store the headers from the download in a hidden file
+                            // alongside the data for future reference. Currently, we
+                            // only use the `content-disposition` header to determine
+                            // what kind of file we downloaded if it doesn't have an
+                            // extension.
+                            var req_meta = {};
+                            response.headers.forEach(function(value, name) {
+                                req_meta[name] = value;
+                            });
+                            var final_url = new URL(response.url);
+                            req_meta.path = final_url.pathname + final_url.search;
+                            fs.writeFile(metapath(options.filepath), JSON.stringify(req_meta), 'utf-8', function(err) {
+                                downloads[dkey].emit('done', err, options.filepath);
+                                delete downloads[dkey];
+                                return callback(err, options.filepath);
+                            });
+                        }
+                    });
+                }, function(err) {
+                    // fetch() reports network errors as "fetch failed" with
+                    // the underlying error as the cause.
+                    return return_on_error(err.cause instanceof Error ? err.cause : err);
                 });
             }
         });
@@ -210,8 +220,8 @@ function localize(url, options, callback) {
             }
         }
         var dir_path = path.dirname(options.filepath);
-        mkdirp(dir_path, 0755, function(err) {
-            if (err && err.code !== 'EEXIST') {
+        fs.mkdir(dir_path, { recursive: true, mode: 0755 }, function(err) {
+            if (err) {
                 if (env == 'development') console.error('[millstone] could not create directory: ' + dir_path);
                 callback(err);
             } else {
@@ -226,7 +236,7 @@ function localize(url, options, callback) {
 
 // Generate the cache path for a given URL.
 function cachepath(location) {
-    var uri = url.parse(location);
+    var uri = utils.parseUrl(location);
     if (!uri.protocol) {
         throw new Error('Invalid URL: ' + location);
     } else {
@@ -494,7 +504,7 @@ function checkTTL(cache, l) {
     var file = l.Datasource.file;
     var ttl = l.Datasource.ttl;
 
-    if (!url.parse(file).protocol) return;
+    if (!utils.parseUrl(file).protocol) return;
 
     var filepath = path.join(cache, cachepath(file));
     fs.stat(filepath, function(err, stats) {
@@ -529,8 +539,8 @@ function resolve(options, callback) {
         benchmark = options.benchmark;
 
     Step(function setup() {
-        if (nosymlink) mkdirp(base, 0755, this);
-        else mkdirp(path.join(base, 'layers'), 0755, this);
+        if (nosymlink) fs.mkdir(base, { recursive: true, mode: 0755 }, this);
+        else fs.mkdir(path.join(base, 'layers'), { recursive: true, mode: 0755 }, this);
     }, function style_externals(err) {
         if (err && err.code !== 'EEXIST') throw err;
         if (benchmark) console.time("[millstone][benchmark] Resolving style (mss) externals");
@@ -569,7 +579,7 @@ function resolve(options, callback) {
             });
 
             CartoURIs.forEach(function(u) {
-                var uri = url.parse(encodeURI(u));
+                var uri = utils.parseUrl(encodeURI(u));
                 // URL.
                 if (uri.protocol && (uri.protocol == 'http:' || uri.protocol == 'https:')) {
                     var filepath = path.join(cache, cachepath(u));
@@ -610,21 +620,21 @@ function resolve(options, callback) {
                 if (env == 'development') console.error("[millstone] processing style '" + s.id + "'");
                 return localizeCartoURIs(s,next);
             }
-            var uri = url.parse(s);
+            var uri = utils.parseUrl(s);
 
             // URL, download.
             if (uri.protocol && (uri.protocol == 'http:' || uri.protocol == 'https:')) {
-                return request({
-                    url: s,
-                    proxy: process.env.HTTP_PROXY
-                }, function(err, response, data) {
-                    if (err) return next(err);
-
+                return undici.fetch(s, { dispatcher: proxyAgent() }).then(function(res) {
+                    if (!res.ok) throw new Error("Unable to download '" + s + "' (server returned " + res.status + ")");
+                    return res.text();
+                }).then(function(data) {
                     resolved.Stylesheet[index] = {
                         id: path.basename(uri.pathname),
-                        data: data.toString()
+                        data: data
                     };
                     localizeCartoURIs(resolved.Stylesheet[index],next);
+                }, function(err) {
+                    next(err.cause instanceof Error ? err.cause : err);
                 });
             }
 
@@ -664,7 +674,7 @@ function resolve(options, callback) {
             if (l.Datasource.ttl) checkTTL(cache, l);
 
             var name = l.name || 'layer-' + index;
-            var uri = url.parse(encodeURI(l.Datasource.file));
+            var uri = utils.parseUrl(encodeURI(l.Datasource.file));
             var pathname = decodeURI(uri.pathname);
             var extname = path.extname(pathname);
             // unbreak pathname on windows if absolute path is used
@@ -790,7 +800,7 @@ function resolve(options, callback) {
                             return next();
                         }
 
-                        var file = url.parse(dbs[i].split('@').pop());
+                        var file = utils.parseUrl(dbs[i].split('@').pop());
                         var pathname = file.pathname;
                         var extname = path.extname(pathname);
                         var alias = dbs[i].split('@').shift();
@@ -1000,7 +1010,7 @@ function flush(options, callback) {
     if (!options.layer) return callback(new Error('options.layer is required'));
     if (!options.url) return callback(new Error('options.url is required'));
 
-    var uri = url.parse(options.url);
+    var uri = utils.parseUrl(options.url);
     if (!uri.protocol) return callback(new Error('Invalid URL: ' + options.url));
 
     var extname = path.extname(path.basename(uri.pathname));

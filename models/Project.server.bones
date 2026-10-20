@@ -16,7 +16,6 @@ var EventEmitter = require('events').EventEmitter;
 var millstone = require('millstone');
 var settings = Bones.plugin.config;
 var tileURL = _('http://<%=url%>/tile/<%=id%>/{z}/{x}/{y}.<%=format%>?updated=<%=updated%>&metatile=<%=metatile%>&scale=<%=scale%>').template();
-var request = require('request');
 var existsSync = require('fs').existsSync || require('path').existsSync;
 
 // object tracks status of tileserver's status localizing a project
@@ -45,13 +44,12 @@ models.Project.prototype.sync = function(method, model, success, error) {
     case 'update':
         // disabled until https://github.com/tilemill-project/tilemill/issues/1851 is resolved
         /*mapnik.clearCache();
-        request.get({ url:'http://'+settings.tileUrl+'/clear-mapnik-cache' }, function(err) {
-            if (err) return error(err);
+        fetch('http://'+settings.tileUrl+'/clear-mapnik-cache').then(function() {
             delete project_tile_status[model.id];
             saveProject(model, function(err, model) {
                 return err ? error(err) : success(model);
             });
-        });
+        }, error);
         */
         delete project_tile_status[model.id];
         saveProject(model, function(err, model) {
@@ -332,9 +330,9 @@ function destroyProject(model, callback) {
         // and let the tileserver start back up on its own.
         // NOTE: not needed with symlinks but millstone does not always use symlinks
         // so we need this on win32 as per https://github.com/mapbox/millstone/issues/71
-        request.post({ url:'http://'+settings.tileUrl+'/restart' }, function(err) {
-            rm(modelPath, callback);
-        });
+        fetch('http://'+settings.tileUrl+'/restart', { method: 'POST' })
+            .catch(function() {})
+            .then(function() { rm(modelPath, callback); });
     } else {
         rm(modelPath, callback);
     }
@@ -435,13 +433,17 @@ function saveProject(model, callback) {
         var lat_rad = model.get('center')[1] * Math.PI / 180;
         var x = parseInt((model.get('center')[0] + 180.0) / 360.0 * Math.pow(2, z));
         var y = parseInt((1.0 - Math.log(Math.tan(lat_rad) + (1 / Math.cos(lat_rad))) / Math.PI) / 2.0 * Math.pow(2, z));
-        request.get({
-            url: tiles.replace('{z}',z).replace('{x}',x).replace('{y}',y),
-            encoding: 'binary'
-        }, this);
-    }, function(err, res, body) {
+        var next = this;
+        var url = tiles.replace('{z}',z).replace('{x}',x).replace('{y}',y);
+        fetch(url).then(function(res) {
+            if (!res.ok) throw new Error('Thumbnail request failed with status ' + res.status + ': ' + url);
+            return res.arrayBuffer();
+        }).then(function(body) {
+            next(null, Buffer.from(body));
+        }, next);
+    }, function(err, body) {
         if (err) throw err;
-        fs.writeFile(path.join(modelPath, '.thumb.png'), body, 'binary', this);
+        fs.writeFile(path.join(modelPath, '.thumb.png'), body, this);
     }, function(err) {
         if (err && err.code !== 'ENOENT') console.error(err);
     });

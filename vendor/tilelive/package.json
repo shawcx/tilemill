@@ -32,16 +32,9 @@
         "Konstantin K\u00e4fer <kkaefer>"
     ],
     "dependencies": {
-        "optimist": "0.6.1",
         "@mapbox/sphericalmercator": "1.1.0"
-    },
-    "bin": {
-        "tilelive-copy": "./bin/copy"
     },
     "engines": {
         "node": ">= 0.6.0 < 0.11.0"
-    },
-    "scripts": {
-        "test": "mocha -R spec -t 10000"
     }
 }

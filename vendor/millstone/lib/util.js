@@ -183,7 +183,18 @@ function processFiles(src, dest, fn, options, callback) {
     });
 }
 
+// Parse a URL with the WHATWG URL API. Strings that are not absolute URLs
+// (plain file paths) come back as a path-only object with a null protocol.
+function parseUrl(str) {
+    try {
+        return new URL(str);
+    } catch (err) {
+        return { protocol: null, host: null, pathname: str, href: str };
+    }
+}
+
 module.exports = {
+    parseUrl: parseUrl,
     forcelink: forcelink,
     rm: rm,
     copy: copy,

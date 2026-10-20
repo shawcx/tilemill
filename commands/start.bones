@@ -10,7 +10,7 @@ command.options['coreUrl'] = { 'default': defaults.coreUrl };
 
 // Retrieve args to pass to child process here
 // prior to Bones filtering out options.
-var args = _(require('optimist').argv).chain()
+var args = _(Bones.argv).chain()
     .map(function(val, key) {
         if (key === '$0') return;
         if (key === '_') return;
