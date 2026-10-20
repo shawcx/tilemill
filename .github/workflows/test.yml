@@ -52,10 +52,12 @@ jobs:
           for i in $(seq 1 60); do curl -sf -o /dev/null http://localhost:20009/ && break; sleep 2; done
           curl -sf -o /dev/null http://localhost:20009/
           for i in $(seq 1 30); do
-            code=$(curl -s -o tile.png -w '%{http_code}' 'http://localhost:20008/tile/geography-class/2/1/1.png?updated=1&metatile=2&scale=1') || true
+            code=$(curl -s -D headers.txt -o tile.png -w '%{http_code}' 'http://localhost:20008/tile/control-room/2/1/1.png?updated=1&metatile=2&scale=1') || true
             [ "$code" = 200 ] && break; sleep 5
           done
-          file tile.png | grep -q 'PNG image data'
+          echo "status: $code"; cat headers.txt; head -c 16 tile.png | od -c | head -2
+          # PNG signature: \x89 P N G
+          [ "$(head -c 4 tile.png | tail -c 3)" = PNG ]
       - name: Container logs
         if: always()
         run: docker logs tilemill || true
