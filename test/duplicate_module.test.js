@@ -5,8 +5,9 @@ var count_module = function(name,callback) {
     var cmd = 'npm ls ' + name;
     exec(cmd,
         function (error, stdout, stderr) {
-            // Count only non-deduped entries; npm aliases print as name@npm:pkg@x.y.z.
-            var pattern = new RegExp('[\\s\u2500]' + name + '@(npm:\\S+@)?\\d+\\.\\d+\\.\\d+$','gm')
+            // Count only non-deduped entries; npm aliases print as name@npm:pkg@x.y.z
+            // and npm 10 marks overridden packages with an "overridden" suffix.
+            var pattern = new RegExp('[\\s\u2500]' + name + '@(npm:\\S+@)?\\d+\\.\\d+\\.\\d+( overridden)?$','gm')
             var match = stdout.match(pattern);
             if (!match) {
                 return callback(null,0);

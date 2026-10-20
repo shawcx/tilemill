@@ -17,6 +17,8 @@ FROM node:24-trixie-slim
 WORKDIR /usr/src/app
 COPY --chown=node:node --from=BUILD /usr/src/app/node_modules /usr/src/app/node_modules
 COPY --chown=node:node . /usr/src/app
+# Workspace packages keep some dependencies in their own node_modules.
+COPY --chown=node:node --from=BUILD /usr/src/app/vendor /usr/src/app/vendor
 
 USER node
 # Export port for tiles
