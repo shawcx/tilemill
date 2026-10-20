@@ -213,6 +213,7 @@ MAPDATA_DIR=""                        # Location where the file will be download
 GEOFABRIK_URL_START="http://download.geofabrik.de/" # Start of geofabrik URL for downloads.
 GEOFABRIK_FILE_END="-latest.osm.pbf"  # Value after the area in the geofabrik file names.
 OVERPASS_API_URL="https://overpass-api.de/api/interpreter" # Overpass API endpoint.
+USER_AGENT="TileMill (https://github.com/tilemill-project/tilemill)" # Overpass rejects curl's default User-Agent.
 OVERPASS_FILE_END="-latest.osm"       # Value to use for a file downloaded from overpass.
 DOWNLOAD_URL=""                       # Variable to hold the full URL (geofabrik) or base URL (overpass).
 OVERPASS_QUERY=""                     # Variable to hold the Overpass QL query (URL-encoded by curl).
@@ -623,13 +624,14 @@ if [ "${DOWNLOAD_DATA}" == "true" ]; then
   echo ""; echo ""
   echo "${info}$0: Downloading the file ${MAPDATA_DIR}${OSM_FILE} from ${DOWNLOAD_URL}...${reset}"
   echo "${info}----------------------------------------------------------------------${reset}"
+  # -f: fail on HTTP errors instead of saving the error page as the OSM file.
   if [ -n "${OVERPASS_QUERY}" ]; then
-    curl -L --data-urlencode "data=${OVERPASS_QUERY}" "${DOWNLOAD_URL}" > "${MAPDATA_DIR}/${OSM_FILE}"
+    curl -fL -A "${USER_AGENT}" --data-urlencode "data=${OVERPASS_QUERY}" "${DOWNLOAD_URL}" > "${MAPDATA_DIR}/${OSM_FILE}"
   else
-    curl -L "${DOWNLOAD_URL}" > "${MAPDATA_DIR}/${OSM_FILE}"
+    curl -fL -A "${USER_AGENT}" "${DOWNLOAD_URL}" > "${MAPDATA_DIR}/${OSM_FILE}"
   fi
   if [ $? != 0 ]; then
-    echo "${error}Error: Download of file failed. Command:${reset} curl -L \"${DOWNLOAD_URL}\" > ${MAPDATA_DIR}/${OSM_FILE}"; exit 1
+    echo "${error}Error: Download of file failed. Command:${reset} curl -fL -A \"${USER_AGENT}\" \"${DOWNLOAD_URL}\" > ${MAPDATA_DIR}/${OSM_FILE}"; exit 1
   fi
 fi
 
@@ -655,9 +657,9 @@ if [ "${LOAD_DB}" == "true" ]; then
   echo ""; echo ""
   echo "${info}$0: Loading the data into the Postgres database...${reset}"
   echo "${info}----------------------------------------------------------------------${reset}"
-  osm2pgsql ${OSM2PGSQL_OPTIONS} ${DB_HOST} ${DB_PORT} --username ${DB_USERNAME} --database ${OSM_DB} --create --multi-geometry --style ${MAPDATA_DIR}/${STYLE} --hstore ${MAPDATA_DIR}/${OSM_FILE}
+  osm2pgsql ${OSM2PGSQL_OPTIONS} ${DB_HOST} ${DB_PORT} -U ${DB_USERNAME} --database ${OSM_DB} --create --multi-geometry --style ${MAPDATA_DIR}/${STYLE} --hstore ${MAPDATA_DIR}/${OSM_FILE}
   if [ $? != 0 ]; then
-    echo "${error}Error: Load of OSM data into database failed. Command:${reset} osm2pgsql ${OSM2PGSQL_OPTIONS} ${DB_HOST} ${DB_PORT} --username ${DB_USERNAME} --database ${OSM_DB} --create --multi-geometry --style ${MAPDATA_DIR}/${STYLE} --hstore ${MAPDATA_DIR}/${OSM_FILE}"; exit 1
+    echo "${error}Error: Load of OSM data into database failed. Command:${reset} osm2pgsql ${OSM2PGSQL_OPTIONS} ${DB_HOST} ${DB_PORT} -U ${DB_USERNAME} --database ${OSM_DB} --create --multi-geometry --style ${MAPDATA_DIR}/${STYLE} --hstore ${MAPDATA_DIR}/${OSM_FILE}"; exit 1
   fi
 
   # Create indexes for better TileMill performance.
