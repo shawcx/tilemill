@@ -52,7 +52,7 @@ jobs:
           for i in $(seq 1 60); do curl -sf -o /dev/null http://localhost:20009/ && break; sleep 2; done
           curl -sf -o /dev/null http://localhost:20009/
           for i in $(seq 1 30); do
-            code=$(curl -s -o tile.png -w '%{http_code}' 'http://localhost:20008/tile/geography-class/2/1/1.png?updated=1&metatile=2&scale=1')
+            code=$(curl -s -o tile.png -w '%{http_code}' 'http://localhost:20008/tile/geography-class/2/1/1.png?updated=1&metatile=2&scale=1') || true
             [ "$code" = 200 ] && break; sleep 5
           done
           file tile.png | grep -q 'PNG image data'
