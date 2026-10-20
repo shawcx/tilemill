@@ -1,13 +1,3 @@
-Backbone.Controller.prototype.route = function(route, name, callback) {
-    Backbone.history || (Backbone.history = new Backbone.History);
-    if (!_.isRegExp(route)) route = this._routeToRegExp(route);
-    Backbone.history.route(route, _.bind(function(fragment) {
-        var args = this._extractParameters(route, fragment);
-        callback.apply(this, args);
-        this.trigger.apply(this, ['route:' + name].concat(args));
-    }, this));
-};
-
 // Client-side `Backbone.View` overrides. Adds an `attach()` method that can be
 // triggered after `render()` to allow client-side specific JS event handlers,
 // UI libraries to be attached or inited. `template()` and `html()` are mirrors
@@ -15,51 +5,17 @@ Backbone.Controller.prototype.route = function(route, name, callback) {
 // View's HTML contents.
 Backbone.View.augment({
     attach: function() {},
-    _configure: function(parent, options) {
+    preinitialize: function(parent, options) {
         parent.call(this, options);
         this.bind('attach', this.attach);
     }
 });
 
-// Fix for Backbone.History.start with 0.3.3 and IE7.
-// See https://github.com/documentcloud/backbone/issues/228
-Backbone.History.prototype.start = function() {
-    $(window).on('hashchange', this.checkUrl);
-    return this.loadUrl();
-};
-
-Backbone.History.prototype._saveLocation = Backbone.History.prototype.saveLocation;
-Backbone.History.prototype.saveLocation = function(fragment) {
-    // Override: Ensure ! so browser behaves correctly when using back button.
-    Backbone.History.prototype._saveLocation.call(this, '!' + fragment.replace(/^!*/, ''));
-};
-
-Backbone.History.prototype.checkUrl = function() {
-    var current = this.getFragment();
-    if (current == this.fragment && this.iframe) {
-        current = this.getFragment(this.iframe.location);
-    }
-    if (current == this.fragment ||
-        current == decodeURIComponent(this.fragment)) return false;
-    if (this.iframe) {
-      // Override: Keep IE happy.
-      this.iframe.location.hash = current;
-      window.location.hash = '!' + current;
-    }
-    this.loadUrl();
-};
-
-Backbone.History.prototype.loadUrl = function() {
-  this.fragment = this.getFragment();
-  // Override: Remove ! to look up route.
-  var fragment = this.fragment.replace(/^!*/, '');
-  var matched = _.any(this.handlers, function(handler) {
-    if (handler.route.test(fragment)) {
-      handler.callback(fragment);
-      return true;
-    }
-  });
-  return matched;
+// Hash URLs keep their leading slash (`#/project/foo` routes as
+// `/project/foo`), as in Backbone 0.3. Older `#!/...` URLs still work.
+Backbone.History.prototype.getFragment = function(fragment) {
+    if (fragment == null) fragment = this.getHash();
+    return fragment.replace(/^[#!]+/, '').replace(/\s+$/, '');
 };
 
 // Generate CSRF protection token that is valid for the specified amount of
@@ -88,7 +44,8 @@ Backbone.csrf = function(path, timeout) {
 // must be used server-side to invalidate requests without this CSRF
 // protection. The original `Backbone.sync` cannot be reused because it does
 // not send a request body for DELETE requests.
-Backbone.sync = function(method, model, success, error) {
+Backbone.sync = function(method, model, options) {
+    options = options || {};
     function getUrl(object) {
         if (!(object && object.url)) throw new Error("A 'url' property or function must be specified");
         return _.isFunction(object.url) ? object.url() : object.url;
@@ -115,10 +72,15 @@ Backbone.sync = function(method, model, success, error) {
         data:         (modelJSON || null),
         dataType:     'json',
         processData:  false,
-        success:      success,
-        error:        error
+        success:      function(resp) {
+            options.bonesResponse = true;
+            if (options.success) options.success(resp);
+        },
+        error:        function(xhr) {
+            if (options.error) options.error(xhr);
+        }
     };
 
     // Make the request.
-    $.ajax(params);
+    return options.xhr = $.ajax(params);
 };

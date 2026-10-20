@@ -2,7 +2,7 @@ view = Backbone.View.extend();
 
 // Override _ensureElement.
 view.prototype._ensureElement = function() {
-    this.el = this.el || $('#page');
+    this.setElement(this.el || $('#page'));
 };
 
 view.prototype.initialize = function(options) {

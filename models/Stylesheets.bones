@@ -11,10 +11,10 @@ model.prototype.initialize = function(models, options) {
     var that = this;
     var change = function() {
         this.parent.set({ 'Stylesheet': that });
-        this.parent.change();
+        this.parent.trigger('change', this.parent);
     };
     this.parent = options.parent;
-    this.bind('refresh', change);
+    this.bind('reset', change);
     this.bind('change', change);
     this.bind('add', change);
     this.bind('remove', change);

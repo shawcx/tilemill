@@ -144,7 +144,11 @@ models.Datasource.prototype.sync = function(method, model, success, error) {
                 if (options.features || options.info) {
                     datasource.fields[f].max = type === 'String'
                         ? (function() {
-                            var val = _(values).max(function(v) { return (v||'').length });
+                            // Longest value; on ties keep the last one, as
+                            // underscore's max did before 1.7.
+                            var val = _(values).reduce(function(memo, v) {
+                                return (v||'').length >= (memo||'').length ? v : memo;
+                            });
                             return (val && val.length > 55) ?
                               val.slice(0, 55 - 3) + '...' : val;
                         })()

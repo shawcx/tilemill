@@ -8,7 +8,7 @@ view.prototype.events = {
 
 // Override _ensureElement.
 view.prototype._ensureElement = function() {
-    this.el = this.el || $('#modal');
+    this.setElement(this.el || $('#modal'));
 };
 
 view.prototype.initialize = function(options) {

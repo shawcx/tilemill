@@ -36,7 +36,7 @@ view.prototype.initialize = function(options) {
 view.prototype.render = function() {
     $('.bleed .active').removeClass('active');
     $('.bleed .settings').addClass('active');
-    this.el.html(templates.Config(this.model));
+    $(this.el).html(templates.Config(this.model));
     Bones.utils.sliders(this.$('.slider'), this.model);
     return this;
 };

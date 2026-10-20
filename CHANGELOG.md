@@ -10,6 +10,7 @@ A summary of changes to TileMill can be found in the [TileMill Documentation Upg
   - bones runs on express 4 and jsdom 26, with a compatibility layer for the express 2 API.
   - millstone unzips with `adm-zip` and downloads with `fetch` (undici), still honoring `HTTP_PROXY`.
   - carto uses js-yaml 4, lodash 4.18 and semver 5.7; mirror minifies with terser.
+- Browser libraries: jQuery 3.7.1, jQuery UI 1.14.2, underscore 1.13.8 and Backbone 1.6.1 (were 1.5.2, 1.8.13, 1.1.7 and 0.3.3). bones keeps Backbone 0.3 behavior where 1.x changed it (routing, sync signature, validation, view options); see `vendor/bones/shared/backbone.js`.
 - Replaced `request`, `optimist`, `mkdirp`, `rimraf` and `url.parse()` with `fetch`, `minimist`, `fs` and the WHATWG `URL` API.
 - carto now gets the target Mapnik version and font list, so unknown fonts are reported as errors.
 - Anonymous system profiling is off by default.
