@@ -288,6 +288,11 @@ command.prototype.initialize = function(plugin, callback) {
             scale: !_(opts.scale).isUndefined() ? opts.scale : model.get('scale'),
             metatile: !_(opts.metatile).isUndefined() ? opts.metatile : model.get('metatile')
         });
+        // Leave unset fields out instead of writing "undefined" into
+        // MBTiles metadata.
+        _(['description', 'attribution']).each(function(key) {
+            if (_(model.mml[key]).isUndefined()) delete model.mml[key];
+        });
 
         // Unset map center if outside bounds.
         var validCenter = (function(center, bounds, minzoom, maxzoom) {

@@ -1,0 +1,61 @@
+name: test
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [22, 24]
+    services:
+      postgis:
+        image: postgis/postgis:17-3.5
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    env:
+      PGHOST: localhost
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: postgres
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0 # lib/gitutil.js runs `git describe --tags`
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - name: Install PostgreSQL client
+        run: command -v psql || (sudo apt-get update && sudo apt-get install -y postgresql-client)
+      - run: npm ci
+      - run: npm test
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - run: docker build -t tilemill:ci .
+      - name: Smoke test
+        run: |
+          docker run -d --name tilemill -p 20008:20008 -p 20009:20009 tilemill:ci
+          for i in $(seq 1 60); do curl -sf -o /dev/null http://localhost:20009/ && break; sleep 2; done
+          curl -sf -o /dev/null http://localhost:20009/
+          for i in $(seq 1 30); do
+            code=$(curl -s -o tile.png -w '%{http_code}' 'http://localhost:20008/tile/geography-class/2/1/1.png?updated=1&metatile=2&scale=1')
+            [ "$code" = 200 ] && break; sleep 5
+          done
+          file tile.png | grep -q 'PNG image data'
+      - name: Container logs
+        if: always()
+        run: docker logs tilemill || true
