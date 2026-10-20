@@ -1,7 +1,27 @@
 var env = process.env.NODE_ENV || 'development';
 var host = require('os').hostname();
 
-exports = module.exports = require('express');
+var express = require('express');
+
+// express 2 bundled its connect middleware; express 4 does not.
+exports = module.exports = {
+    'static': express['static'],
+    'json': express.json,
+    'urlencoded': express.urlencoded,
+    'cookieParser': require('cookie-parser')
+};
+
+exports['bodyParser'] = function bodyParser(options) {
+    options = Object.assign({ limit: '50mb' }, options);
+    var json = express.json(options);
+    var urlencoded = express.urlencoded(Object.assign({ extended: true }, options));
+    return function bodyParser(req, res, next) {
+        json(req, res, function(err) {
+            if (err) return next(err);
+            urlencoded(req, res, next);
+        });
+    };
+};
 
 exports['sanitizeHost'] = function sanitizeHost(app) {
     var hosts = app.config.host;

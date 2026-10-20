@@ -20,7 +20,7 @@ TileMill is a modern map design studio powered by [Node.js](https://nodejs.org) 
 
 - Node.js 22 or newer (tested on 24 LTS)
 - Mapnik, SQLite and GDAL come as prebuilt binaries via `@mapnik/mapnik`, `sqlite3` and `gdal-async`; no system libraries are needed on Linux x64/arm64 or macOS.
-- `bones`, `millstone`, `tilelive` and `srs` are vendored under `vendor/` (npm workspaces) with fixes for modern Node.
+- `bones`, `millstone`, `mirror`, `tilelive` and `srs` are vendored under `vendor/` (npm workspaces) with fixes for modern Node. Bones runs on express 4 with a compatibility layer for the express 2 API (`vendor/bones/server/compat.js`).
 
 
 # Installation
