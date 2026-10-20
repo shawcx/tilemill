@@ -11,7 +11,7 @@ view.prototype.initialize = function(options) {
 };
 
 view.prototype.render = function() {
-    if (this.$('.colors').size()) return this;
+    if (this.$('.colors').length) return this;
     var groups = {};
     allColors = abilities.carto.colors;
     colorKeys = Object.keys(allColors);
@@ -34,7 +34,7 @@ view.prototype.render = function() {
 view.prototype.insert = function(ev) {
     var target = $(ev.currentTarget);
     target.addClass('insert').siblings().removeClass('insert');
-    $('input', target).select();
+    $('input', target).trigger('select');
     return false;
 };
 
@@ -47,7 +47,7 @@ view.prototype.keydown = function(ev) {
 
 // Hook in to projet view with an augment.
 views.Project.augment({
-    events: { 'click a[href=#colors]': 'colors' },
+    events: { 'click a[href="#colors"]': 'colors' },
     colors: function() {
         new view({ el:$('#drawer') })
     },

@@ -1,7 +1,7 @@
 view = Backbone.View.extend();
 
 view.prototype.events = {
-    'click a[href=#close]': 'close',
+    'click a[href="#close"]': 'close',
     'click input.ok': 'ok',
     'click input.cancel': 'close'
 };
@@ -62,7 +62,7 @@ view.prototype.render = function() {
 };
 
 view.prototype.close = function() {
-    if (!$('#popup.active').size()) $('body').removeClass('overlay');
+    if (!$('#popup.active').length) $('body').removeClass('overlay');
     $(this.el).removeClass('active');
     return false;
 };

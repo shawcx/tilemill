@@ -547,7 +547,6 @@ utils/ - Utility scripts
 ./assets/images/sprite.svg
 ./assets/images/controls_2x.png
 ./assets/images/bg.png
-./assets/js/jquery.ui.js
 ./assets/js/showdown.js
 ./assets/js/codemirror.js
 ./assets/js/colorpicker.classic.js

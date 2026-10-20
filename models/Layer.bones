@@ -76,7 +76,7 @@ model.prototype.validate = function(attr) {
         this.collection &&
         this.collection.get(attr.id) &&
         this.collection.get(attr.id) !== this)
-            return new Error(_('Layer with ID "<%=id%>" already exists.').template(attr));
+            return new Error(_('Layer with ID "<%=id%>" already exists.').template()(attr));
 
     return this.validateAttributes(attr);
 };

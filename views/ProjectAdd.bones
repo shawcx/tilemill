@@ -11,7 +11,7 @@ view.prototype.initialize = function(options) {
 
 view.prototype.render = function() {
     this.$('.content').html(templates.ProjectAdd(this.model));
-    this.$('input[type=text]:first').focus();
+    this.$('input[type=text]:first').trigger('focus');
     return this;
 };
 
@@ -28,7 +28,7 @@ view.prototype.save = function() {
                 this.model.collection.add(this.model);
                 $(this.el).removeClass('loading');
                 window.location.hash = '#/project/' + this.model.get('id');
-                this.$('a[href="#close"]').click();
+                this.$('a[href="#close"]').trigger('click');
             }).bind(this));
         }).bind(this),
         error:error

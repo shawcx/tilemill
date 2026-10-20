@@ -30,5 +30,5 @@ model.prototype.validate = function(attr) {
         this.collection &&
         this.collection.get(attr.id) &&
         this.collection.get(attr.id) !== this)
-            return new Error(_('Stylesheet "<%=id%>" already exists.').template(attr));
+            return new Error(_('Stylesheet "<%=id%>" already exists.').template()(attr));
 };

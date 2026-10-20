@@ -11,7 +11,7 @@ view.prototype.initialize = function(options) {
 };
 
 view.prototype.render = function() {
-    if (this.$('.fonts').size()) return this;
+    if (this.$('.fonts').length) return this;
     var groups = {};
     var fonts = _(abilities.fonts).map(function(font) {
         var group = font.toUpperCase().charCodeAt(0);
@@ -30,7 +30,7 @@ view.prototype.render = function() {
 view.prototype.insert = function(ev) {
     var target = $(ev.currentTarget);
     target.addClass('insert').siblings().removeClass('insert');
-    $('input', target).select();
+    $('input', target).trigger('select');
     return false;
 };
 
@@ -43,7 +43,7 @@ view.prototype.keydown = function(ev) {
 
 // Hook in to projet view with an augment.
 views.Project.augment({
-    events: { 'click a[href=#fonts]': 'fonts' },
+    events: { 'click a[href="#fonts"]': 'fonts' },
     fonts: function() {
         new view({ el:$('#drawer') })
     },

@@ -62,16 +62,16 @@ controller.prototype.project = function(id, next) {
 controller.prototype.projectExport = function(id, format) {
     this.project(id, _(function() {
         if (format) {
-            $('.actions a[href=#export-'+format+']').click();
+            $('.actions a[href="#export-'+format+'"]').trigger('click');
         } else {
-            $('.actions a[href=#exports]').click();
+            $('.actions a[href="#exports"]').trigger('click');
         }
     }).bind(this));
 };
 
 controller.prototype.projectSettings = function(id, format) {
     this.project(id, _(function() {
-        $('.actions a[href=#settings]').click();
+        $('.actions a[href="#settings"]').trigger('click');
     }).bind(this));
 };
 

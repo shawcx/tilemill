@@ -12,7 +12,7 @@ var options = {
 // TODO for Bones 1.4: This should be moved to the initialize method!
 server.prototype.assets = {
     vendor: new mirror([
-        require.resolve('bones/assets/jquery'),
+        require.resolve('jquery/dist/jquery.js'),
         // The browser build; the package's default export for require() is Node-only.
         require.resolve('underscore/underscore-umd.js'),
         require.resolve('backbone')

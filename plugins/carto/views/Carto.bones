@@ -8,7 +8,7 @@ view.prototype.initialize = function(options) {
     this.render();
     this._carto_state = options._carto_state;
     if (this._carto_state.section) {
-        $('a[href=' + this._carto_state.section + ']').click();
+        $('a[href="' + this._carto_state.section + '"]').trigger('click');
     }
 };
 
@@ -17,7 +17,7 @@ view.prototype.toggler = function(ev) {
 };
 
 view.prototype.render = function() {
-    if (this.$('.manual').size()) return this;
+    if (this.$('.manual').length) return this;
 
     this.$('.content').html(templates.Reference(abilities.carto));
     /*this.$('pre.carto-snippet').each(function(i, elem) {
@@ -38,7 +38,7 @@ view.prototype.render = function() {
 
 // Hook in to project view with an augment.
 views.Project.augment({
-    events: { 'click a[href=#carto]': 'carto' },
+    events: { 'click a[href="#carto"]': 'carto' },
     carto: function() {
         new view({
             el:$('#drawer'),

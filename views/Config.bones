@@ -9,7 +9,7 @@ view.prototype.events = {
     'keyup input[name=files]': 'files',
     'change input[name=files]': 'files',
     'click input[type=submit]': 'save',
-    'click a[href=#disable]': 'disable',
+    'click a[href="#disable"]': 'disable',
     'click a[href="/oauth/mapbox"]': 'proxyWarning'
 };
 

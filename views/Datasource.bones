@@ -1,7 +1,7 @@
 view = Backbone.View.extend();
 
 view.prototype.events = {
-    'click a[href=#back]': 'back',
+    'click a[href="#back"]': 'back',
     'click a.showall': 'showAll',
     'keyup input.search' : 'searchFeatures'
 };
@@ -13,7 +13,7 @@ view.prototype.initialize = function(options) {
 };
 
 view.prototype.back = function() {
-    $('.palette a[href=#layers]').click();
+    $('.palette a[href="#layers"]').trigger('click');
     return false;
 };
 

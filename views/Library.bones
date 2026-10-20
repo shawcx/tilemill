@@ -49,7 +49,7 @@ view.prototype.render = function() {
         breadcrumb: breadcrumb,
         model:this.model
     }));
-    if (this.$('.assets').size()) {
+    if (this.$('.assets').length) {
         this.$('.assets').replaceWith($('.assets', render));
         this.$('.breadcrumb').replaceWith($('.breadcrumb', render));
     } else {
@@ -77,7 +77,7 @@ view.prototype.library = function(ev) {
 view.prototype.libraryUpdate = function() {
     _(['File', 'PostGIS', 'Sqlite']).each(_(function(id) {
         id = 'favorites' + id;
-        if (this.$('a[href=#' + id + ']').is('.active')) {
+        if (this.$('a[href="#' + id + '"]').is('.active')) {
             this.model.set(this.favorites.toLibrary(id, this.context));
             this.render();
         }

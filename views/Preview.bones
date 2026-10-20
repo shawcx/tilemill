@@ -56,7 +56,7 @@ view.prototype.upload = function(ev) {
     }).save({}, {
         success: _(function(model) {
             this.collection.add(model);
-            $('a.close', this.el).click();
+            $('a.close', this.el).trigger('click');
         }).bind(this)
     }));
     return false;

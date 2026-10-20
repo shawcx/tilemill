@@ -13,7 +13,7 @@ view.prototype.render = function() {
     this.$('.content').html(templates.Stylesheet({}));
 
     // Autofocus first field.
-    this.$('input[type=text]:first').focus();
+    this.$('input[type=text]:first').trigger('focus');
     return this;
 };
 
@@ -26,7 +26,7 @@ view.prototype.save = function() {
     };
     if (this.model.set(attr, options)) {
         this.model.collection.add(this.model);
-        this.$('a[href="#close"]').click();
+        this.$('a[href="#close"]').trigger('click');
     }
     return false;
 };

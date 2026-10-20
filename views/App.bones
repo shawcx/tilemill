@@ -95,9 +95,9 @@ view = Backbone.View.extend();
 
 view.prototype.events = {
     'click .bleed a': 'unload',
-    'click #popup a[href=#close], #popup input.cancel': 'popupClose',
+    'click #popup a[href="#close"], #popup input.cancel': 'popupClose',
     'click a.popup': 'popupOpen',
-    'click #drawer a[href=#close]': 'drawerClose',
+    'click #drawer a[href="#close"]': 'drawerClose',
     'click a.drawer': 'drawerOpen',
     'click .button.dropdown': 'dropdown',
     'click .toggler a': 'toggler',
@@ -187,12 +187,12 @@ view.prototype.keydown = function(ev) {
         // @TODO for some reason a function bound from the Modal view
         // to a keydown event is not fired. Probably related to
         // event delegation/bubbling?
-        if (this.$('#modal.active').size()) {
-            if (!$('#popup.active').size()) $('body').removeClass('overlay');
+        if (this.$('#modal.active').length) {
+            if (!$('#popup.active').length) $('body').removeClass('overlay');
             this.$('#modal.active').removeClass('active');
-        } else if (this.$('#popup.active').size()) {
+        } else if (this.$('#popup.active').length) {
             this.popupClose();
-        } else if (this.$('#drawer.active').size()) {
+        } else if (this.$('#drawer.active').length) {
             this.drawerClose();
         }
         return false;
@@ -206,7 +206,7 @@ view.prototype.keydown = function(ev) {
     // receive the event.
     if (ev.which == 83 &&
         ((ev.ctrlKey || ev.metaKey) && !ev.altKey)) {
-        this.$('.actions a[href=#save]').click();
+        this.$('.actions a[href="#save"]').trigger('click');
         return false;
     }
 };
@@ -248,7 +248,7 @@ view.prototype.restart = function(ev) {
                     .removeClass('loading')
                     .removeClass('restarting')
                     .removeClass('restartable');
-                if (parent.is('#drawer')) $('a[href=#close]',parent).click();
+                if (parent.is('#drawer')) $('a[href="#close"]',parent).trigger('click');
             });
         },
         error: function(err) {
@@ -257,7 +257,7 @@ view.prototype.restart = function(ev) {
                 .removeClass('loading')
                 .removeClass('restarting')
                 .removeClass('restartable');
-            if (parent.is('#drawer')) $('a[href=#close]',parent).click();
+            if (parent.is('#drawer')) $('a[href="#close"]',parent).trigger('click');
             new views.Modal(err);
         }
     });

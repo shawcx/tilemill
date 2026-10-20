@@ -22,7 +22,7 @@ view.prototype.events = {
         input[name=margin_top],\
         input[name=margin_btm],\
         input[name=margin_left],\
-        input[name=margin_right], ': 'updateBox'
+        input[name=margin_right]': 'updateBox'
 };
 
 view.prototype.initialize = function(options) {
@@ -118,7 +118,7 @@ view.prototype.render = function() {
     wax.mm.zoomer(this.map).appendTo(this.map.parent);
     this.map.setExtent(extent);
 
-    if (this.$('input[name=bounds]').size()) {
+    if (this.$('input[name=bounds]').length) {
         this.boxselector = wax.mm.boxselector(this.map, {}, _(function(data) {
             var s = _(data).chain().pluck('lat').min().value().toFixed(4);
             var n = _(data).chain().pluck('lat').max().value().toFixed(4);
@@ -127,18 +127,18 @@ view.prototype.render = function() {
             if (w < -180) w += 360; else if (w > 180) w -= 360;
             if (e < -180) e += 360; else if (e > 180) e -= 360;
             this.$('input[name=bounds]').val([w,s,e,n].join(','));
-            if (this.$('input[name=width]').size()) this.updateSize();
-            if (this.$('.slider .range').size()) this.updateTotal();
+            if (this.$('input[name=width]').length) this.updateSize();
+            if (this.$('.slider.range').length) this.updateTotal();
             // If only updating Project Settings, don't set bounding box aspect ratio
             //if (this.model != this.project {
             if (this.model != this.project && this.model.attributes.format != 'mbtiles') {
                 this.updateAspect();
             }
         }).bind(this));
-        this.$('input[name=setaspect]').attr('checked', false);
+        this.$('input[name=setaspect]').prop('checked', false);
         this.boxselector.extent(extent);
     }
-    if (this.$('input[name=center]').size()) {
+    if (this.$('input[name=center]').length) {
         var first = true;
         this.pointselector = wax.mm.pointselector(this.map, {}, _(function(data) {
             var point = data.pop();
@@ -162,10 +162,10 @@ view.prototype.render = function() {
     }
 
     // Update state of custom format field.
-    if (this.$('select[name=format]').size()) this.updateCustomFormat();
+    if (this.$('select[name=format]').length) this.updateCustomFormat();
 
     // Update total tiles
-    if (this.$('.slider .range').size()) this.updateTotal();
+    if (this.$('.slider.range').length) this.updateTotal();
 
     // Set up map zoom display.
     this.map.addCallback('zoomed', this.mapZoom);
@@ -266,28 +266,28 @@ view.prototype.updateAspect = function(ev) {
     var orientation = this.$('select.orientation-selection').val().toLowerCase();
 
     // Default settings to common values.
-    this.$('input[name=bounds]').attr('disabled', true);                // Bounds disabled
+    this.$('input[name=bounds]').prop('disabled', true);                // Bounds disabled
     this.$('select.orientation-selection').attr('hidden',true)          // Orientation hidden
     this.$('div[id=custom-aspect-ratio]')[0].setAttribute('hidden',true); // Custom fields hidden
-    this.$('input[name=fullaspectwidth]').attr('disabled', true);       // AspectWidth disabled
-    this.$('input[name=fullaspectheight]').attr('disabled', true);      // AspectHeight disabled
-    this.$('input[name=setaspect]').attr('checked', true);              // SetAspect checked/locked
+    this.$('input[name=fullaspectwidth]').prop('disabled', true);       // AspectWidth disabled
+    this.$('input[name=fullaspectheight]').prop('disabled', true);      // AspectHeight disabled
+    this.$('input[name=setaspect]').prop('checked', true);              // SetAspect checked/locked
     this.$('div[id=margins]')[0].removeAttribute('hidden');             // Margin fields displayed
-    this.$('input[name=printedwidth]').attr('disabled', true);          // PrintedWidth disabled
+    this.$('input[name=printedwidth]').prop('disabled', true);          // PrintedWidth disabled
 
     switch (papersize) {
     case 'freeform': //disable fields and remove size restriction
-        this.$('input[name=bounds]').attr('disabled', false);           // Bounds enabled
-        this.$('input[name=setaspect]').attr('checked', false);         // SetAspect unchecked/unlocked
+        this.$('input[name=bounds]').prop('disabled', false);           // Bounds enabled
+        this.$('input[name=setaspect]').prop('checked', false);         // SetAspect unchecked/unlocked
         this.$('div[id=margins]')[0].setAttribute('hidden',true);       // Margin fields hidden
-        this.$('input[name=printedwidth]').attr('disabled', false);     // PrintedWidth enabled
+        this.$('input[name=printedwidth]').prop('disabled', false);     // PrintedWidth enabled
         return false;
         break;    
     case 'custom':   //allow user to draw custom bounding box
         //enable aspect ratio fields (if not already defaulted to enabled)
         this.$('div[id=custom-aspect-ratio]')[0].removeAttribute('hidden'); // Custom fields displayed
-        this.$('input[name=fullaspectwidth]').attr('disabled', false);  // AspectWidth enabled
-        this.$('input[name=fullaspectheight]').attr('disabled', false); // AspectHeight enabled
+        this.$('input[name=fullaspectwidth]').prop('disabled', false);  // AspectWidth enabled
+        this.$('input[name=fullaspectheight]').prop('disabled', false); // AspectHeight enabled
         break;
     default:         //use standard paper size for aspect ratio
         this.$('select.orientation-selection').attr('hidden',false);    // Orientation displayed
@@ -448,7 +448,7 @@ view.prototype.updateSize = function(ev) {
     // Switch based upon which field was changed
     switch (target.attr('name')) {
     case 'bounds':
-        this.$('input[name=setaspect]').attr('checked', false);
+        this.$('input[name=setaspect]').prop('checked', false);
         this.boxselector.extent([nwLoc, seLoc], true);
         break;
     case 'height':

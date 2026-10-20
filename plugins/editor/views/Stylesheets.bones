@@ -2,12 +2,12 @@ view = Backbone.View.extend();
 
 view.prototype.events = {
     'click .swatch': 'colorOpen',
-    'click .swatch a[href=#save]': 'colorSave',
-    'click .swatch a[href=#close]': 'colorClose',
+    'click .swatch a[href="#save"]': 'colorSave',
+    'click .swatch a[href="#close"]': 'colorClose',
     'click a.add': 'stylesheetAdd',
     'click a.icon': 'stylesheetDelete',
     'sortupdate .tabs': 'sortStylesheets',
-    'click .status a[href=#close]': 'statusClose',
+    'click .status a[href="#close"]': 'statusClose',
     'click #tabs-left': 'moveTabsLeft',
     'click #tabs-right': 'moveTabsRight'
 };
@@ -90,7 +90,7 @@ view.prototype.error = function(model, resp) {
                 var stylesheet = this.model.get('Stylesheet').get(match[2]),
                     id = 'stylesheet-' + stylesheet.id.replace(/[\.]/g, '-'),
                     lineNum = parseInt(match[3]) - 1;
-                this.$('.tabs a[href=#' + id + ']').addClass('error');
+                this.$('.tabs a[href="#' + id + '"]').addClass('error');
                 stylesheet.errors = stylesheet.errors || [];
                 lines.push(lineNum+1);
                 stylesheet.errors[lineNum] = match[5] + ' (line ' + (lineNum+1) + ')';
@@ -208,7 +208,7 @@ view.prototype.makeStylesheet = function(model) {
     model.bind('remove', _(function(model) {
         model.el.remove();
         $(model.codemirror.getWrapperElement()).remove();
-        this.$('.tabs a.tab:last').click();
+        this.$('.tabs a.tab:last').trigger('click');
     }).bind(this));
     
     // Initial color swatch update for this stylesheet
@@ -268,10 +268,8 @@ view.prototype.css2rgb = function(c) {
 };
 
 view.prototype.colorOpen = function(ev) {
-    // Colorpicker uses canvas... disable in IE for now.
-    if ($.browser.msie) return;
 
-    if (this.$('#colorpicker').size()) return;
+    if (this.$('#colorpicker').length) return;
 
     var swatch = $(ev.currentTarget);
     $(this.el).addClass('overlay');
@@ -592,7 +590,7 @@ view.prototype.updateColorSwatches = function() {
 };
 
 view.prototype.moveTabsLeft = function() {
-    if (this.$('.tabs:animated').size() > 0) return;
+    if (this.$('.tabs:animated').length > 0) return;
 
     var contentWidth = 0;
     this.$('.tabs li').each(function(i, li) {
@@ -609,7 +607,7 @@ view.prototype.moveTabsLeft = function() {
 };
 
 view.prototype.moveTabsRight = function() {
-    if (this.$('.tabs:animated').size() > 0) return;
+    if (this.$('.tabs:animated').length > 0) return;
 
     var currentMargin = parseInt(this.$('.tabs').css('margin-left'));
 

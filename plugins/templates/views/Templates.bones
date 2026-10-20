@@ -14,7 +14,7 @@ view.prototype.initialize = function(options) {
 };
 
 view.prototype.render = function() {
-    if (this.$('.tooltips').size()) return this;
+    if (this.$('.tooltips').length) return this;
     this.$('.content').html(templates.Templates(this.model));
     return this;
 };
@@ -26,7 +26,7 @@ view.prototype.attach = function() {
     // If no layer hide tokens.
     if (!layer) {
         this.$('.tokens').empty();
-        this.$('.requires-tokens').attr('disabled', true);
+        this.$('.requires-tokens').prop('disabled', true);
         this.$('.description.toggler').removeClass('warning');
         this.$('#layer-info').html('<small>Layer to use for interaction data</small>');
         return true;
@@ -37,7 +37,7 @@ view.prototype.attach = function() {
         this.$('.tokens').html(_(fields).map(function(f) {
             return '<code>{{{' + f + '}}}</code>';
         }).join(' '));
-        this.$('.requires-tokens').attr('disabled', false);
+        this.$('.requires-tokens').prop('disabled', false);
         $(this.el).removeClass('loading').removeClass('restartable');
     }).bind(this);
 
@@ -97,7 +97,7 @@ view.prototype.update = function(ev) {
 
 // Hook in to project view with an augment.
 views.Project.augment({
-    events: { 'click a[href=#templates]': 'templates' },
+    events: { 'click a[href="#templates"]': 'templates' },
     templates: function() {
         new view({ model: this.model, el:$('#drawer') })
     },

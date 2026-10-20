@@ -2,15 +2,15 @@ view = Backbone.View.extend();
 
 view.prototype.events = {
     'click input[type=submit]': 'save',
-    'click a[href=#open]': 'browse',
-    'click a[href=#favorite]': 'favoriteToggle',
+    'click a[href="#open"]': 'browse',
+    'click a[href="#favorite"]': 'favoriteToggle',
     'keyup input[name$=file], input[name=connection]': 'favoriteUpdate',
     'change input[name$=file], input[name=connection]': 'favoriteUpdate',
     'keyup input[name$=file], .layer-postgis textarea': 'placeholderUpdate',
     'change input[name$=file], .layer-postgis textarea': 'placeholderUpdate',
-    'click a[href=#cacheFlush]': 'cacheFlush',
-    'change select[name=Datasource.extent_cache]': 'extentSelect',
-    'click a[href=#extentCacheFlush]': 'extentCacheFlush',
+    'click a[href="#cacheFlush"]': 'cacheFlush',
+    'change select[name="Datasource.extent_cache"]': 'extentSelect',
+    'click a[href="#extentCacheFlush"]': 'extentCacheFlush',
     'change select[name=srs]': 'extentCacheFlush',
     'change select[name=srs-name]': 'nameToSrs',
     'keyup input[name=srs]': 'srsToName'
@@ -42,16 +42,16 @@ view.prototype.render = function() {
 
     // Quick easy way to check and set whether input
     // URI is favorited.
-    this.$('input[name$=file], input[name=connection]').change();
+    this.$('input[name$=file], input[name=connection]').trigger('change');
 
     // Set active tab.
     var ds = this.model.get('Datasource')
     var type = ds && ds.type;
-    this.$('a[href=#layer-' + (type||'file') + ']').click();
+    this.$('a[href="#layer-' + (type||'file') + '"]').trigger('click');
 
     if (!this.model.id) {
         // Autofocus first field for new layers.
-        this.$('input[type=text]:first').focus();
+        this.$('input[type=text]:first').trigger('focus');
     } else {
         // Check if we are using a custom sub layer of multiple for ogr datasources
         if (ds.layer) {
@@ -261,7 +261,7 @@ view.prototype.browse = function(ev) {
                     model: model,
                     favorites: this.favorites,
                     context: 'layer',
-                    change: function(uri) { $('input.browsable', form).val(uri).change(); },
+                    change: function(uri) { $('input.browsable', form).val(uri).trigger('change'); },
                     el: $('.browser', form)
                 });
             }).bind(this),
@@ -288,7 +288,7 @@ view.prototype.autostyle = function() {
                 coord,
                 coord);
         }
-        $('.actions a[href=#save]').click();
+        $('.actions a[href="#save"]').trigger('click');
     }
 };
 
@@ -399,7 +399,7 @@ view.prototype.save = function(e) {
                 this.model.collection.add(this.model);
                 if (autostyle) this.autostyle();
             }
-            this.$('a[href="#close"]').click();
+            this.$('a[href="#close"]').trigger('click');
         }).bind(this),
         error: error
     });

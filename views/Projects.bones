@@ -1,6 +1,6 @@
 view = Backbone.View.extend({
     events: {
-        'click a[href=#add]': 'add',
+        'click a[href="#add"]': 'add',
         'click .delete': 'del',
         'mouseover .info': 'description',
         'mouseleave .info': 'info'
@@ -26,7 +26,7 @@ view = Backbone.View.extend({
         var id = $(ev.currentTarget).attr('id');
         var model = this.collection.get(id);
         new views.Modal({
-            content: _('Are you sure you want to delete "<%=get("name")||id%>?"').template(model),
+            content: _('Are you sure you want to delete "<%=get("name")||id%>?"').template()(model),
             callback: _(function() {
                 model.destroy({
                     success: _(function() {

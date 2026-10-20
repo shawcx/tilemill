@@ -234,7 +234,7 @@ model.prototype.validate = function(attr) {
         this.collection &&
         this.collection.get(attr.id) &&
         this.collection.get(attr.id) !== this)
-            return new Error(_('Project "<%=id%>" already exists.').template(attr));
+            return new Error(_('Project "<%=id%>" already exists.').template()(attr));
 
     if (attr.interactivity && attr.interactivity.layer && attr.Layer) {
         var id = attr.interactivity.layer;
@@ -242,7 +242,7 @@ model.prototype.validate = function(attr) {
             ? attr.Layer
             : attr.Layer.toJSON();
         if (!_(layers).chain().pluck('id').include(id).value())
-            return new Error(_('Interactivity layer "<%=obj%>" does not exist.').template(id));
+            return new Error(_('Interactivity layer "<%=obj%>" does not exist.').template()(id));
     }
 
     if (attr.bounds && attr.bounds[0] >= attr.bounds[2])

@@ -1,17 +1,17 @@
 view = Backbone.View.extend();
 
 view.prototype.events = {
-    'click a[href=#fetch]':      'fetchOSM',
-    'click a[href=#load]':       'loadFile',
-    'click a[href=#open]':          'browseFile',
+    'click a[href="#fetch"]':      'fetchOSM',
+    'click a[href="#load"]':       'loadFile',
+    'click a[href="#open"]':          'browseFile',
     'click a.icon.favorite':        'favoriteToggle',
     'keyup input[name=file-path]':  'favoriteUpdate',
     'change input[name=file-path]': 'favoriteUpdate',
-    'click a[href=#pg-start]':   'pgStart',
-    'click a[href=#pg-stop]':    'pgStop',
-    'click a[href=#pg-restart]': 'pgRestart',
-    'click a[href=#pg-refresh]': 'pgRefresh',
-    'click a[href=#pg-details]': 'toggleDetails'
+    'click a[href="#pg-start"]':   'pgStart',
+    'click a[href="#pg-stop"]':    'pgStop',
+    'click a[href="#pg-restart"]': 'pgRestart',
+    'click a[href="#pg-refresh"]': 'pgRefresh',
+    'click a[href="#pg-details"]': 'toggleDetails'
 };
 
 view.prototype.initialize = function() {

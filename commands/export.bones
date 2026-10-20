@@ -668,7 +668,7 @@ command.prototype.sync = function (project, callback) {
         data.progress = (data.progress*0.5) + modifier;
         return data;
     };
-    cmd.opts.filepath = _(cmd.opts.files + '/cache/tm-sync-<%=id%>-<%=time%>.mbtiles').template({
+    cmd.opts.filepath = _(cmd.opts.files + '/cache/tm-sync-<%=id%>-<%=time%>.mbtiles').template()({
         id: project.id,
         time: + new Date
     });

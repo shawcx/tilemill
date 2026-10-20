@@ -19,7 +19,7 @@ view.prototype.initialize = function(options) {
 };
 
 view.prototype.render = function(force) {
-    if (force === true || this.$('ul.exports').size()) {
+    if (force === true || this.$('ul.exports').length) {
         this.$('.content').html(templates.Exports(this));
     }
     return this;
@@ -85,7 +85,7 @@ view.prototype.updateExport = function(ev) {
             $('#meta').empty();
             $('.project').removeClass('meta');
             if (!$('#drawer').is('.active')) {
-                $('a[href=#exports]').click();
+                $('a[href="#exports"]').trigger('click');
             }
             // Call exportList() to display lists of exports
             this.exportList();
@@ -198,7 +198,7 @@ view.prototype.poll = function() {
             return _(['waiting','processing']).include(m.get('status'))
         })
         && $('#drawer').is('.active')
-        && this.$('ul.exports').size();
+        && this.$('ul.exports').length;
 
     if (active && !Bones.intervals.exports) {
         Bones.intervals.exports = setInterval(_(function() {

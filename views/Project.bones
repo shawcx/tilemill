@@ -1,11 +1,11 @@
 view = Backbone.View.extend();
 
 view.prototype.events = {
-    'click .actions a[href=#save]': 'save',
-    'click .actions a[href^=#export-]': 'exportAdd',
-    'click .actions a[href=#exports]': 'exportList',
-    'click a[href=#settings]': 'settings',
-    'click a[href=#layers]': 'layers',
+    'click .actions a[href="#save"]': 'save',
+    'click .actions a[href^="#export-"]': 'exportAdd',
+    'click .actions a[href="#exports"]': 'exportList',
+    'click a[href="#settings"]': 'settings',
+    'click a[href="#layers"]': 'layers',
     'click .breadcrumb .logo': 'unload',
 	 'keyup input.search' : 'searchStyles',
     'mousedown .resize-handle': 'startResize'
@@ -33,7 +33,7 @@ view.prototype.initialize = function() {
 
     if (Bones.intervals.project) clearInterval(Bones.intervals.project);
     Bones.intervals.project = setInterval(_(function() {
-        if (!$('.project').size()) return;
+        if (!$('.project').length) return;
         this.model.poll({ error: function(m, err) {
             new views.Modal(err);
             clearInterval(Bones.intervals.project);
@@ -61,7 +61,7 @@ view.prototype.startTileStatusPolling = function() {
     this.project_checks = 0;
     if (Bones.intervals.projectTile) clearInterval(Bones.intervals.projectTile);
     Bones.intervals.projectTile = setInterval(_(function() {
-        if (!$('.project').size()) return;
+        if (!$('.project').length) return;
         this.model.pollTileServer({
             success: _(function(m, resp) {
                 if (resp && resp.status) {
@@ -126,11 +126,11 @@ view.prototype.render = function(init) {
 view.prototype.attach = function() {
     $(this.el).removeClass('saving');
     this.$('.workspace .name').text(this.model.get('name')||this.model.id);
-    this.$('.actions a[href=#save]').addClass('disabled');
+    this.$('.actions a[href="#save"]').addClass('disabled');
 };
 
 view.prototype.change = function() {
-    this.$('.actions a[href=#save]').removeClass('disabled');
+    this.$('.actions a[href="#save"]').removeClass('disabled');
 };
 
 view.prototype.error = function() {
@@ -138,7 +138,7 @@ view.prototype.error = function() {
 };
 
 view.prototype.save = function() {
-    if (this.$('.actions a[href=#save]').is('.disabled')) return false;
+    if (this.$('.actions a[href="#save"]').is('.disabled')) return false;
     this.model.save();
     return false;
 };
@@ -184,7 +184,7 @@ view.prototype.exportAdd = function(ev) {
             this.$('#meta').empty();
             this.$('.project').removeClass('meta');
             if (!$('#drawer').is('.active')) {
-                $('a[href=#exports]').click();
+                $('a[href="#exports"]').trigger('click');
             }
             this.exportList();
         }).bind(this),
@@ -232,8 +232,8 @@ view.prototype.layers = function(ev) {
 // unbind when handling the beforeunload event. Check that we are indeed on a
 // project view when doing this.
 view.prototype.unload = function(ev) {
-    if (!$('.project').size()) return;
-    if ($('.actions a.disabled[href=#save]').size()) return;
+    if (!$('.project').length) return;
+    if ($('.actions a.disabled[href="#save"]').length) return;
     if (ev && ev.metaKey) return;
 
     var message = 'You have unsaved changes. Are you sure you want to close this project?';

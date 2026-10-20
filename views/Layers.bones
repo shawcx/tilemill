@@ -186,10 +186,15 @@ view.prototype.layerExtent = function(ev) {
 }
 
 view.prototype.layerInspect = function(ev) {
-    $('#drawer .content').empty();
-    $('#drawer')
-        .addClass('loading')
-        .addClass('restartable');
+    // Empty the drawer after this click has bubbled to the App view's
+    // `a.drawer` handler; the link lives inside it, and jQuery only matches
+    // delegated handlers for targets that are still in the document.
+    _.defer(function() {
+        $('#drawer .content').empty();
+        $('#drawer')
+            .addClass('loading')
+            .addClass('restartable');
+    });
     var id = $(ev.currentTarget).attr('href').split('#').pop();
     var layer = this.model.get('Layer').get(id);
     var model = new models.Datasource(_(layer.get('Datasource')).extend({
