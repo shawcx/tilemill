@@ -54,9 +54,13 @@ require.extensions['._'] = function(module, filename) {
 
     module.exports.register = function(app) {
         if (app.assets && !(/\.server\._$/.test(filename))) {
+            // The compiled template is a closure, so ship its `source`
+            // (a `function(obj, _)`) rather than its own toString().
             app.assets.templates.push({
                 filename: filename,
-                content: 'template = ' + module.exports + ';'
+                content: 'template = (function(render) { return function(data) {' +
+                    ' return render.call(this, data, _); }; })(' +
+                    module.exports.source + ');'
             });
         }
     };

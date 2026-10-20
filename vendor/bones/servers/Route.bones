@@ -13,7 +13,8 @@ var options = {
 server.prototype.assets = {
     vendor: new mirror([
         require.resolve('bones/assets/jquery'),
-        require.resolve('underscore'),
+        // The browser build; the package's default export for require() is Node-only.
+        require.resolve('underscore/underscore-umd.js'),
         require.resolve('backbone')
     ], { type: '.js' }),
     core: new mirror([
