@@ -2,6 +2,16 @@
 
 A summary of changes to TileMill can be found in the [TileMill Documentation Upgrade Notes](https://tilemill-project.github.io/tilemill/docs/upgrade/). Detailed dev notes about changes can be found below.
 
+## [v1.2.0] - 2026-08-30
+
+- Added a Postgres Management window for working with OSM data: fetch OSM data from Overpass API and import into Postgres database, select local .osm or .osm.pbf file to import into Postgres database, view and manage local Postgres Server.
+- Added a Colors plugin: see all the built-in colors and values
+- Exports improvements: static map enhancements, reuse prior export settings, updated MBTiles metadata attributes for export
+- Editor improvements: color swatches in the MSS style editor, and draggable panel widths for adjusting map and side-panel window sizes.
+- Startup script now specifies the npm version and adds more logging.
+- Added history, logging, and performance improvements for OSM data fetching and map rendering, including a caching fix and separate basic/detailed Postgres status checks.
+
+
 ## [v1.1.0] - 2019-05-30
 
 - Boxselector enhancements from Wax allowing box to be moved relative to the map without changing the box size.

@@ -14,6 +14,7 @@ if (mapnik.register_default_input_plugins) mapnik.register_default_input_plugins
 var semver = require('semver');
 var os = require('os');
 var crypto = require('crypto');
+var stats = require('../lib/stats');
 // node v6 -> v8 compatibility
 var existsSync = require('fs').existsSync || require('path').existsSync;
 
@@ -78,7 +79,7 @@ command.options['updates'] = {
 command.options['profile'] = {
     'title': 'profile=1|0',
     'description': 'Report system profile anonymously.',
-    'default': true
+    'default': false
 };
 
 command.options['concurrency'] = {
@@ -91,9 +92,10 @@ command.options['updatesTime'] = { 'default': 0 };
 command.options['updatesVersion'] = { 'default': '0.0.1' };
 
 command.prototype.bootstrap = function(plugin, callback) {
-    process.title = 'tilemill-ui';
-
     var settings = Bones.plugin.config;
+    settings.process = settings.process || 'tilemill';
+    process.title = settings.process + '-ui';
+    console.log("process.title-core: ",process.title);//timtim
     settings.host = false;
     settings.files = path.resolve(settings.files.replace(/^~/, process.env.HOME));
     settings.coreUrl = settings.coreUrl || '127.0.0.1:' + settings.port;
@@ -108,6 +110,16 @@ command.prototype.bootstrap = function(plugin, callback) {
                 return _(fs.readFileSync(path.resolve(__dirname + '/../VERSION'),'utf8').split('\n')).compact();
             } catch(e) {
                 return ['unknown', 'unknown'];
+            }
+        })(),
+        // Git remote/branch this checkout was built from (from the REPO file
+        // written at install-time), used to tell forks/branches apart in
+        // anonymous system profile reports. See lib/stats.js.
+        repo: (function() {
+            try {
+                return JSON.parse(fs.readFileSync(path.resolve(__dirname + '/../REPO'), 'utf8'));
+            } catch(e) {
+                return { remote: 'unknown', branch: 'unknown' };
             }
         })(),
         platform: process.platform,
@@ -132,6 +144,8 @@ command.prototype.bootstrap = function(plugin, callback) {
             svg: mapnik.supports.cairo_svg || mapnik.supports.cairo
         }
     };
+
+    stats.report(settings, Bones.plugin.abilities);
 
     var configDir = path.join(process.env.HOME, '.tilemill');
     if (!existsSync(configDir)) {

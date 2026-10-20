@@ -12,6 +12,9 @@ function Server(plugin) {
     // while express' own methods stay on the app itself.
     var app = express();
     Object.setPrototypeOf(app, Object.getPrototypeOf(this));
+    // express mixes EventEmitter.prototype into the app, including its
+    // `constructor`; point it back at the server class.
+    app.constructor = this.constructor;
     app._errorHandlers = [];
     app.del = app['delete'];
     app.listen = Server.prototype.listen;
@@ -51,7 +54,12 @@ _.extend(Server.prototype, Backbone.Events, {
     listen: function() {
         var server = require('http').createServer(this);
         this.httpServer = server;
-        return server.listen.apply(server, arguments);
+        // In express 2 the app was the http server, so listen callbacks ran
+        // with `this` as the app. Keep that.
+        var args = Array.prototype.slice.call(arguments);
+        var last = args.length - 1;
+        if (typeof args[last] === 'function') args[last] = args[last].bind(this);
+        return server.listen.apply(server, args);
     },
 
     address: function() {
