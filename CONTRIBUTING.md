@@ -16,15 +16,22 @@
 
 # Running tests
 
-Install mocha and run the tests
+Install the dependencies and run the tests
 
-    npm install mocha
+    npm install
     npm test
 
-Note: the tests require a running postgres server and a postgis enabled
-database called `template_postgis`. 
+Note: the tests require the postgres client tools (`psql`, `createdb`), a
+running postgres server and a postgis enabled database called
+`template_postgis`. Connection settings come from the standard `PG*`
+environment variables. The quickest way is a throwaway PostGIS container:
 
-If you do not have a template_postgis create one like:
+    docker run -d --rm --name tilemill-test-postgis -p 127.0.0.1:55432:5432 \
+        -e POSTGRES_PASSWORD=tilemill postgis/postgis:17-3.5
+    PGHOST=127.0.0.1 PGPORT=55432 PGUSER=postgres PGPASSWORD=tilemill npm test
+    docker stop tilemill-test-postgis
+
+If you use your own server and do not have a template_postgis create one like:
 
     createdb -E UTF8 template_postgis
     psql -c "CREATE EXTENSION postgis" template_postgis

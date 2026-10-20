@@ -84,7 +84,7 @@ it('GET shapefile datasource with features', function(done) {
 
 it('GET postgis datasource', function(done) {
     assert.response(tile,
-        { url: '/datasource/postgis?table%3D%2210m-admin-0-boundary-lines-land%22&key_field=&geometry_field=&extent=-15312095%2C-6980576.5%2C15693558%2C11093272&type=postgis&dbname=tilemill_test&id=postgis&srs=%2Bproj%3Dmerc+%2Ba%3D6378137+%2Bb%3D6378137+%2Blat_ts%3D0.0+%2Blon_0%3D0.0+%2Bx_0%3D0.0+%2By_0%3D0+%2Bk%3D1.0+%2Bunits%3Dm+%2Bnadgrids%3D%40null+%2Bwktext+%2Bno_defs+%2Bover&project=demo_01' },
+        { url: '/datasource/postgis?table=%2210m-admin-0-boundary-lines-land%22&key_field=&geometry_field=&extent=-15312095%2C-6980576.5%2C15693558%2C11093272&type=postgis&dbname=tilemill_test&id=postgis&srs=%2Bproj%3Dmerc+%2Ba%3D6378137+%2Bb%3D6378137+%2Blat_ts%3D0.0+%2Blon_0%3D0.0+%2Bx_0%3D0.0+%2By_0%3D0+%2Bk%3D1.0+%2Bunits%3Dm+%2Bnadgrids%3D%40null+%2Bwktext+%2Bno_defs+%2Bover&project=demo_01' },
         { status: 200 },
         function(res) {
             var body = JSON.parse(res.body);
@@ -103,7 +103,7 @@ it('GET postgis datasource', function(done) {
 
 it('GET postgis datasource with features', function(done) {
     assert.response(tile,
-        { url: '/datasource/postgis?table%3D%2210m-admin-0-boundary-lines-land%22&key_field=&geometry_field=&extent=-15312095%2C-6980576.5%2C15693558%2C11093272&type=postgis&dbname=tilemill_test&id=postgis&srs=%2Bproj%3Dmerc+%2Ba%3D6378137+%2Bb%3D6378137+%2Blat_ts%3D0.0+%2Blon_0%3D0.0+%2Bx_0%3D0.0+%2By_0%3D0+%2Bk%3D1.0+%2Bunits%3Dm+%2Bnadgrids%3D%40null+%2Bwktext+%2Bno_defs+%2Bover&project=demo_01&features=true' },
+        { url: '/datasource/postgis?table=%2210m-admin-0-boundary-lines-land%22&key_field=&geometry_field=&extent=-15312095%2C-6980576.5%2C15693558%2C11093272&type=postgis&dbname=tilemill_test&id=postgis&srs=%2Bproj%3Dmerc+%2Ba%3D6378137+%2Bb%3D6378137+%2Blat_ts%3D0.0+%2Blon_0%3D0.0+%2Bx_0%3D0.0+%2By_0%3D0+%2Bk%3D1.0+%2Bunits%3Dm+%2Bnadgrids%3D%40null+%2Bwktext+%2Bno_defs+%2Bover&project=demo_01&features=true' },
         { status: 200 },
         function(res) {
             var body = JSON.parse(res.body);
