@@ -21,7 +21,6 @@ controller.prototype.routes = {
     '/manual': 'manual',
     '/manual/:page?': 'manual',
     '/settings': 'config',
-    '/plugins': 'plugins',
     '/postgres': 'postgres',
 };
 
@@ -102,13 +101,6 @@ controller.prototype.config = function() {
         error: function(model, err) {
             new views.Modal(err);
         }
-    });
-};
-
-controller.prototype.plugins = function() {
-    new views.Plugins({
-        el: $('#page'),
-        collection: new models.Plugins(_(window.abilities.plugins).toArray())
     });
 };
 

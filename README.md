@@ -46,15 +46,44 @@ It is also possible to run tilemill as a docker container:
 
     git clone https://github.com/tilemill-project/tilemill.git
     cd tilemill
-    docker-compose up
-    
-This will host a docker container which uses the port 20008 and 20009 for tilemill, tilemill is then reachable under [http://localhost:20009](http://localhost:20009) .
-Additionally, a postgis instance is started as well which is reachable under 
+    docker compose up
+
+TileMill is then reachable at [http://localhost:20009](http://localhost:20009) (tiles on port 20008).
+A PostGIS 17 instance is started as well and is reachable from the host at
 
 	host=localhost port=5432 user=docker password=docker dbname=gis
 
+All ports are bound to 127.0.0.1, so they are only reachable from this machine. Inside the
+compose network TileMill reaches the database as `host=postgis`.
+
 Docker hosted volumes are used for the containers, hence if you want to use sqlite dbs you have to interact with those to get the dbs into the docker container.
-    
+
+#### Upgrading the PostGIS database
+
+Older versions of `docker-compose.yml` used `kartoza/postgis:9.6-2.4` with the `postgisVolume`
+volume. PostgreSQL 17 cannot read that data directory, so the new setup uses a fresh volume,
+`postgisData`, and leaves the old one untouched. To move your data across:
+
+1. Before updating, with the old `docker-compose.yml`, dump the `gis` database:
+
+        docker compose exec -T -e PGPASSWORD=docker postgis pg_dump -h localhost -U docker -Fc gis > gis.dump
+        docker compose down
+
+   If you already updated, run `git checkout <old commit> -- docker-compose.yml` to get the old
+   file back temporarily.
+
+2. With the new `docker-compose.yml`, start the database and restore the dump:
+
+        docker compose up -d postgis
+        docker compose exec -T postgis pg_restore -U docker -d gis --no-owner < gis.dump
+
+   `pg_restore` reports errors for old PostGIS 2.4 helper functions (`could not access file
+   "$libdir/postgis-2.4"`). These are legacy functions that no longer exist in PostGIS 3 and can
+   be ignored; your tables and data are restored.
+
+3. Once you have checked your data, the old volume can be removed with
+   `docker volume rm <project>_postgisVolume` (see `docker volume ls`).
+
 # Build Status, Running Tests, Updating Documentation
 
 See CONTRIBUTING.md

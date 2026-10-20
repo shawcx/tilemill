@@ -22,7 +22,6 @@ var args = _(Bones.argv).chain()
 command.prototype.initialize = function(plugin, callback) {
     plugin.config.process = plugin.config.process || 'tilemill';
     process.title = plugin.config.process;
-    console.log("process.title-start: ",process.title);//timtim
 
     // Default out the coreUrl, needed to point the client
     // window at the right URL.

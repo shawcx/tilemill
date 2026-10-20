@@ -2,6 +2,22 @@
 
 A summary of changes to TileMill can be found in the [TileMill Documentation Upgrade Notes](https://tilemill-project.github.io/tilemill/docs/upgrade/). Detailed dev notes about changes can be found below.
 
+## [Unreleased] - modern Node
+
+- Runs on Node.js 22 and newer (tested on 24 LTS); the Docker image uses node:24.
+- Native modules use prebuilt binaries: `@mapnik/mapnik` 4.8 (Mapnik 4.3), `sqlite3` 6, `gdal-async` 3.12. No system Mapnik or GDAL needed on Linux x64/arm64 or macOS.
+- Vendored and updated `bones`, `carto` 1.2, `millstone`, `mirror`, `tilelive` and `srs` under `vendor/` (npm workspaces):
+  - bones runs on express 4 and jsdom 26, with a compatibility layer for the express 2 API.
+  - millstone unzips with `adm-zip` and downloads with `fetch` (undici), still honoring `HTTP_PROXY`.
+  - carto uses js-yaml 4, lodash 4.18 and semver 5.7; mirror minifies with terser.
+- Replaced `request`, `optimist`, `mkdirp`, `rimraf` and `url.parse()` with `fetch`, `minimist`, `fs` and the WHATWG `URL` API.
+- carto now gets the target Mapnik version and font list, so unknown fonts are reported as errors.
+- Anonymous system profiling is off by default.
+- Fixed the static export preview and MBTiles metadata (no more `attribution="undefined"`) with Mapnik 4.
+- Removed the unused Plugins page, the old macOS app build (`platforms/osx`) and `rebuild_cxx.sh`.
+- Tests run on GitHub Actions against PostGIS 17; see CONTRIBUTING.md to run them locally.
+- `docker-compose.yml` uses `postgis/postgis:17-3.5`. Existing `postgisVolume` data from the old 9.6 image must be dumped and restored (see README).
+
 ## [v1.2.0] - 2026-08-30
 
 - Added a Postgres Management window for working with OSM data: fetch OSM data from Overpass API and import into Postgres database, select local .osm or .osm.pbf file to import into Postgres database, view and manage local Postgres Server.

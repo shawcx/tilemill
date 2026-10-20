@@ -95,7 +95,6 @@ command.prototype.bootstrap = function(plugin, callback) {
     var settings = Bones.plugin.config;
     settings.process = settings.process || 'tilemill';
     process.title = settings.process + '-ui';
-    console.log("process.title-core: ",process.title);//timtim
     settings.host = false;
     settings.files = path.resolve(settings.files.replace(/^~/, process.env.HOME));
     settings.coreUrl = settings.coreUrl || '127.0.0.1:' + settings.port;

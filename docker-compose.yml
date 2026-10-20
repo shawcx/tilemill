@@ -1,33 +1,46 @@
-version: "3.3"
 services:
   postgis:
-    image: kartoza/postgis:9.6-2.4
-    volumes:
-      - postgisVolume:/var/lib/postgresql
+    # The official image is amd64-only; it runs emulated on Apple Silicon.
+    # imresamu/postgis:17-3.5 (from the postgis/docker-postgis maintainer)
+    # is a multi-arch alternative.
+    image: postgis/postgis:17-3.5
+    platform: linux/amd64
+    restart: unless-stopped
     environment:
-      - POSTGRES_USER=docker
-      - POSTGRES_PASS=docker
-      - ALLOW_IP_RANGE=0.0.0.0/0
+      POSTGRES_USER: docker
+      POSTGRES_PASSWORD: docker
+      POSTGRES_DB: gis    # created with the postgis extension enabled
+    volumes:
+      # PostgreSQL 17 cannot read the 9.6 data in the old `postgisVolume`;
+      # see "Upgrading the PostGIS database" in README.md.
+      - postgisData:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U docker -d gis"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
 
   tilemill:
     build:
       context: ./
+    restart: unless-stopped
     ports:
-      - "20008:20008"
-      - "20009:20009"
+      - "127.0.0.1:20008:20008"
+      - "127.0.0.1:20009:20009"
     volumes:
       - tilemillVolume:/home/node/
     environment:
-      - PGPORT=5432
-      - PGHOST=postgis
-      - PGDATABASE=gis
-      - PGUSER=docker
-      - PGPASSWORD=docker    
+      PGHOST: postgis
+      PGPORT: 5432
+      PGDATABASE: gis
+      PGUSER: docker
+      PGPASSWORD: docker
     depends_on:
-      - postgis
+      postgis:
+        condition: service_healthy
 
 volumes:
-  postgisVolume:
+  postgisData:
   tilemillVolume:
