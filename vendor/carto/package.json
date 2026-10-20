@@ -1,0 +1,39 @@
+{
+    "name": "carto",
+    "version": "1.2.0",
+    "description": "Mapnik Stylesheet Compiler",
+    "url": "https://github.com/mapbox/carto",
+    "repository": {
+        "type": "git",
+        "url": "http://github.com/mapbox/carto.git"
+    },
+    "author": {
+        "name": "Mapbox",
+        "url": "http://mapbox.com/",
+        "email": "info@mapbox.com"
+    },
+    "keywords": [
+        "mapnik",
+        "maps",
+        "css",
+        "stylesheets"
+    ],
+    "contributors": [
+        "Tom MacWright <macwright@gmail.com>",
+        "Konstantin K\u00e4fer",
+        "Alexis Sellier <self@cloudhead.net>"
+    ],
+    "license": "Apache-2.0",
+    "main": "./lib/carto/index",
+    "engines": {
+        "node": ">=22"
+    },
+    "dependencies": {
+        "chroma-js": "~1.3.5",
+        "hsluv": "~0.0.1",
+        "js-yaml": "^4.1.0",
+        "lodash": "^4.18.1",
+        "mapnik-reference": "~8.10.0",
+        "semver": "^5.7.2"
+    }
+}

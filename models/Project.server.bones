@@ -196,7 +196,7 @@ function loadProject(model, callback) {
         var projectName = path.join(modelPath, 'project.mml');
         if (err) return callback(new Error.HTTP('Project does not exist: "' + projectName + '"', 404));
         try {
-            object = _(object).extend(yaml.safeLoad(file.data));
+            object = _(object).extend(yaml.load(file.data));
         } catch(err) {
             var err_message = 'Could not open project.mml file for "' + model.id + '". Error was: \n\n"' + err.message + '"\n\n(in ' + projectName + ')';
             return callback(new Error(err_message));
@@ -467,16 +467,17 @@ function compileStylesheet(mml, callback) {
         mapnik.register_fonts(fonts);
     }
 
-    var env = {
-        validation_data: { fonts: mapnik.fonts() },
-        returnErrors: true,
+    // carto 1.x takes a single options object.
+    var options = {
+        version: require('../lib/cartoversion'),
+        validationData: { fonts: mapnik.fonts() },
         effects: []
     };
 
     // try/catch here as per https://github.com/tilemill-project/tilemill/issues/1370
     // with carto 1.x, it no longer throws an error for compile errors, instead returned data is null
     try {
-        var xml = new carto.Renderer(env, { mapnik_version: require('../lib/cartoversion') }).render(mml);
+        var xml = new carto.Renderer(options).render(mml);
         if (xml.data != null) {
             return callback(null, xml);
         } else {
