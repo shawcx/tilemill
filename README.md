@@ -35,7 +35,7 @@ TileMill is a modern map design studio powered by [Node.js](https://nodejs.org) 
 # Installation
 ### Quick installation instructions for Linux and macOS:
 
-    git clone https://github.com/tilemill-project/tilemill.git
+    git clone https://github.com/shawcx/tilemill.git
     cd tilemill
     nvm install 24
     nvm use 24
@@ -53,7 +53,7 @@ Scripts have been created that will do most everything for you. They were writte
 ### Docker
 It is also possible to run tilemill as a docker container:
 
-    git clone https://github.com/tilemill-project/tilemill.git
+    git clone https://github.com/shawcx/tilemill.git
     cd tilemill
     docker compose up
 
