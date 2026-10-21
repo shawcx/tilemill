@@ -1,10 +1,19 @@
-# Latest Status - August 30, 2026
+# Latest Status - October 2026
 
-Lots of improvements with v1.2.0 to make map exports easier, visual aids for colors, and managing Postgres.
+TileMill now runs on modern Node.js. Highlights since v1.2.0:
 
-See [Change Log](https://tilemill-project.github.io/tilemill/CHANGELOG.md) for more details.
+- **Node.js 22+** (tested on 24 LTS), with current npm.
+- **No system libraries to build.** Mapnik 4, SQLite and GDAL come as prebuilt binaries (`@mapnik/mapnik`, `sqlite3`, `gdal-async`) on Linux x64/arm64 and macOS.
+- **Updated server stack.** `bones`, `carto` 1.2, `millstone`, `mirror`, `tilelive` and `srs` are vendored under `vendor/` and run on express 4 and jsdom 26. Unmaintained packages (`request`, `optimist`, `mkdirp`, `rimraf`, `uglify-js` 1.x) are replaced.
+- **Updated browser libraries.** jQuery 3.7, jQuery UI 1.14, underscore 1.13 and Backbone 1.6 (were 1.5, 1.8, 1.1 and 0.3), with a compatibility layer so existing views behave the same.
+- **PostGIS 17 in Docker.** `docker compose` now uses `postgis/postgis:17-3.5` with a healthcheck, and binds its ports to localhost only. If you have data in the old 9.6 volume, see [Upgrading the PostGIS database](#upgrading-the-postgis-database).
+- **CI on GitHub Actions.** Tests run on Node 22 and 24 against PostGIS, plus a Docker build and smoke test.
+- **Fixes:** carto now validates fonts against the target Mapnik version, MBTiles exports no longer write `attribution="undefined"`, the static export preview works with Mapnik 4, and the OSM loader script works with current Overpass and osm2pgsql.
+- **Removed:** the broken Plugins page and the old macOS app build.
 
-Next planned release v1.3.0 will update npm to a more recent version, as well as other dependecies.
+v1.2.0 (August 30, 2026) added easier map exports, visual aids for colors, and a Postgres management window.
+
+See the [Change Log](CHANGELOG.md) for details.
 
 
 # General Info
@@ -24,7 +33,7 @@ TileMill is a modern map design studio powered by [Node.js](https://nodejs.org) 
 
 
 # Installation
-### Quick installation instructions for OSX:
+### Quick installation instructions for Linux and macOS:
 
     git clone https://github.com/tilemill-project/tilemill.git
     cd tilemill
